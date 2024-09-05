@@ -1,7 +1,5 @@
 package com.example.reduxtestapp.redux
 
-import android.util.Log
-import android.widget.Toast
 import com.example.reduxtestapp.data.model.TodoItem
 
 data class AppState (
