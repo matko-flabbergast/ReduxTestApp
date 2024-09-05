@@ -5,10 +5,11 @@ import com.example.reduxtestapp.data.model.TodoItem
 import com.example.reduxtestapp.data.repository.TodoRepository
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.redux.todosReducer
-import com.example.reduxtestapp.repositories.MockTodoRepository
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
-import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.reduxkotlin.Store
@@ -20,22 +21,14 @@ class RepoMiddlewareTest {
     private lateinit var store: Store<AppState>
     private val testDispatcher = StandardTestDispatcher()
 
+    // UNDER TEST
     private lateinit var middleware: RepoMiddleware
+
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setUp() {
-        repo = MockTodoRepository()
-        runBlocking {
-            repo.insertTodo(
-                TodoItem("Todo number 1", true)
-            )
-            repo.insertTodo(
-                TodoItem("Todo number 2", false)
-            )
-            repo.insertTodo(
-                TodoItem("Todo number 3", false)
-            )
-        }
+
+        repo = mockk<TodoRepository>()
 
         middleware = RepoMiddleware(repo)
 
@@ -46,7 +39,8 @@ class RepoMiddlewareTest {
             preloadedState = AppState(),
             enhancer = applyMiddleware(
                 CheckDispatchedActionsMiddleware::actionsMiddleware,
-                RepoMiddleware(repo)::todoMiddleware
+                RepoMiddleware(repo)::todoMiddleware,
+                AsyncMiddleware::asyncMiddleware
             )
         )
 
@@ -61,7 +55,41 @@ class RepoMiddlewareTest {
         val testText = "Test Todo"
         store.dispatch(Action.AddTodo(testText))
         advanceUntilIdle()
-        assert(CheckDispatchedActionsMiddleware.dispatchedActions.any{it is Action.UpdateTodoList})
+        assert(CheckDispatchedActionsMiddleware.dispatchedActions
+            .any{ it is Action.UpdateTodoList }
+        )
+    }
+
+    @Test
+    fun `calls Repo to add Todo after AddTodo action`() = runTest {
+        val testText = "Test Todo"
+
+        coEvery { repo.insertTodo(any()) } returns listOf(
+            TodoItem(testText, false)
+        )
+
+        store.dispatch(Action.AddTodo(testText))
+
+        coVerify (exactly = 1) {
+            repo.insertTodo(any())
+        }
+
+    }
+
+    @Test
+    fun `calls Repo to toggle Todo after ToggleTodo action`() = runTest {
+
+        val index = 1
+        coEvery { repo.toggleTodo(any()) } returns listOf(
+            TodoItem("todo 1", false),
+            TodoItem("todo 2", true)
+        )
+
+        store.dispatch(Action.ToggleTodo(index))
+
+        coVerify (exactly = 1) {
+            repo.toggleTodo(index)
+        }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
