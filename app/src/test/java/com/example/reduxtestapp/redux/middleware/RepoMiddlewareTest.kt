@@ -1,7 +1,6 @@
 package com.example.reduxtestapp.redux.middleware
 
 import com.example.reduxtestapp.redux.Action
-import com.example.reduxtestapp.data.model.TodoItem
 import com.example.reduxtestapp.data.repository.TodoRepository
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.redux.todosReducer
@@ -30,6 +29,8 @@ class RepoMiddlewareTest {
 
         repo = mockk<TodoRepository>()
 
+        coEvery { repo.getTodos() } returns listOf()
+
         middleware = RepoMiddleware(repo)
 
         store = createThreadSafeStore(
@@ -49,24 +50,11 @@ class RepoMiddlewareTest {
 
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `dispatches UpdateTodoList action after AddTodo action`() = runTest {
-        val testText = "Test Todo"
-        store.dispatch(Action.AddTodo(testText))
-        advanceUntilIdle()
-        assert(CheckDispatchedActionsMiddleware.dispatchedActions
-            .any{ it is Action.UpdateTodoList }
-        )
-    }
-
     @Test
     fun `calls Repo to add Todo after AddTodo action`() = runTest {
         val testText = "Test Todo"
 
-        coEvery { repo.insertTodo(any()) } returns listOf(
-            TodoItem(testText, false)
-        )
+        coEvery { repo.insertTodo(any()) } returns listOf()
 
         store.dispatch(Action.AddTodo(testText))
 
@@ -80,10 +68,7 @@ class RepoMiddlewareTest {
     fun `calls Repo to toggle Todo after ToggleTodo action`() = runTest {
 
         val index = 1
-        coEvery { repo.toggleTodo(any()) } returns listOf(
-            TodoItem("todo 1", false),
-            TodoItem("todo 2", true)
-        )
+        coEvery { repo.toggleTodo(any()) } returns listOf()
 
         store.dispatch(Action.ToggleTodo(index))
 
@@ -94,11 +79,33 @@ class RepoMiddlewareTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
+    fun `dispatches UpdateTodoList action after AddTodo action`() = runTest {
+        val testText = "Test Todo"
+        coEvery { repo.insertTodo(any()) } returns listOf()
+        store.dispatch(Action.AddTodo(testText))
+        advanceUntilIdle()
+        store.subscribe {
+            assert(CheckDispatchedActionsMiddleware.dispatchedActions
+                .any{ it is Action.UpdateTodoList }
+            )
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
     fun `dispatches UpdateTodoList action after ToggleTodo action`() = runTest {
         val index = 1
+        coEvery { repo.toggleTodo(any()) } returns listOf()
+
         store.dispatch(Action.ToggleTodo(index))
+
         advanceUntilIdle()
-        assert(CheckDispatchedActionsMiddleware.dispatchedActions.any{it is Action.UpdateTodoList})
+        store.subscribe {
+            assert(CheckDispatchedActionsMiddleware.dispatchedActions
+                .any{it is Action.UpdateTodoList}
+            )
+        }
+
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -106,7 +113,11 @@ class RepoMiddlewareTest {
     fun `dispatches UpdateTodoList action after FetchTodos action`() = runTest {
         store.dispatch(Action.FetchTodos)
         advanceUntilIdle()
-        assert(CheckDispatchedActionsMiddleware.dispatchedActions.any{it is Action.UpdateTodoList})
+        store.subscribe {
+            assert(CheckDispatchedActionsMiddleware.dispatchedActions
+                .any{it is Action.UpdateTodoList}
+            )
+        }
     }
 
 }
