@@ -1,8 +1,6 @@
 package com.example.reduxtestapp.redux
 
-import android.util.Log
-import android.widget.Toast
-import com.example.reduxtestapp.data.model.TodoItem
+import com.example.reduxtestapp.data.model.todo.TodoItem
 
 data class AppState (
     val todoList: List<TodoItem> = listOf(),
@@ -12,14 +10,11 @@ data class AppState (
 fun todosReducer(state: AppState, action: Any): AppState {
 
     return when (action) {
-        is Action.UpdateTodoList -> {
+        is Action.Todo.UpdateTodoList -> {
             state.copy(
                 todoList = action.items
             )
         }
-        is Action.SetVisibilityFilter -> state.copy(
-            visibilityFilter = state.visibilityFilter
-        )
         else -> state
     }
 }

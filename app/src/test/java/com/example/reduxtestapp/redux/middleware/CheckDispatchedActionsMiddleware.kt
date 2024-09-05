@@ -6,12 +6,14 @@ import org.reduxkotlin.Store
 
 object CheckDispatchedActionsMiddleware {
 
-    val dispatchedActions = mutableListOf<Any>()
+    private val _dispatchedActions = mutableListOf<Any>()
+    val dispatchedActions: List<Any> = _dispatchedActions
+
 
     fun actionsMiddleware(store: Store<AppState>) = { next: Dispatcher ->
         { action: Any ->
 
-            dispatchedActions.add(action)
+            _dispatchedActions.add(action)
 
             next(action)
 
