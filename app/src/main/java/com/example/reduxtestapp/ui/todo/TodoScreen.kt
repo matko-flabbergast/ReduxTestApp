@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.redux.TodoUiData
-import com.example.reduxtestapp.data.model.TodoItem
+import com.example.reduxtestapp.data.model.todo.TodoItem
 import com.example.reduxtestapp.ui.todo.transitions.TodoTransitions
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -70,7 +70,7 @@ fun TodoScreen(
     }
 
     // initial fetch of todos
-    store.dispatch(Action.FetchTodos)
+    store.dispatch(Action.Todo.FetchTodos)
 
     Scaffold (
         floatingActionButton = {
@@ -92,7 +92,7 @@ fun TodoScreen(
             TodoList(
                 todoItems = uiState,
                 onCompleteChanged = { index, _ ->
-                    store.dispatch(Action.ToggleTodo(index))
+                    store.dispatch(Action.Todo.ToggleTodo(index))
                 }
             )
         }
@@ -102,7 +102,7 @@ fun TodoScreen(
     if (triggerDialog) {
         AddTodoDialog(
             onConfirm = {text ->
-                store.dispatch(Action.AddTodo(text))
+                store.dispatch(Action.Todo.AddTodo(text))
                 triggerDialog = false
             },
             onDismiss = {
