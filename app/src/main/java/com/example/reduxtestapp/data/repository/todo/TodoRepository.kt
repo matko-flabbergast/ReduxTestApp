@@ -1,7 +1,7 @@
-package com.example.reduxtestapp.data.repository
+package com.example.reduxtestapp.data.repository.todo
 
 import com.example.reduxtestapp.redux.VisibilityFilter
-import com.example.reduxtestapp.data.model.TodoItem
+import com.example.reduxtestapp.data.model.todo.TodoItem
 
 interface TodoRepository {
 

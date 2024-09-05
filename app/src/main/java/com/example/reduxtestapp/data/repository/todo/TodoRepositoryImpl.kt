@@ -1,4 +1,4 @@
-package com.example.reduxtestapp.data.repository
+package com.example.reduxtestapp.data.repository.todo
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.reduxtestapp.redux.VisibilityFilter
-import com.example.reduxtestapp.data.model.TodoItem
+import com.example.reduxtestapp.data.model.todo.TodoItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
