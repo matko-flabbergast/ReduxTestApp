@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import org.reduxkotlin.Dispatcher
 import org.reduxkotlin.Store
 
-object AsyncMiddleware {
+class AsyncMiddleware {
 
     fun asyncMiddleware(store: Store<AppState>) = { next: Dispatcher ->
         { action: Any ->

@@ -1,7 +1,7 @@
 package com.example.reduxtestapp.redux.middleware
 
-import com.example.reduxtestapp.data.model.TodoItem
-import com.example.reduxtestapp.data.repository.TodoRepository
+import com.example.reduxtestapp.data.model.todo.TodoItem
+import com.example.reduxtestapp.data.repository.todo.TodoRepository
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
 import org.reduxkotlin.Dispatcher
@@ -15,21 +15,21 @@ class RepoMiddleware (
         { action: Any ->
 
             when (action) {
-                is Action.AddTodo ->
+                is Action.Todo.AddTodo ->
                     store.dispatch(Action.Async {
                         val newList = repo.insertTodo(
                             TodoItem(action.text, false)
                         )
-                        store.dispatch(Action.UpdateTodoList(newList))
+                        store.dispatch(Action.Todo.UpdateTodoList(newList))
                     })
-                is Action.ToggleTodo ->
+                is Action.Todo.ToggleTodo ->
                     store.dispatch(Action.Async {
                         val newList = repo.toggleTodo(action.index)
-                        store.dispatch(Action.UpdateTodoList(newList))
+                        store.dispatch(Action.Todo.UpdateTodoList(newList))
                     })
-                is Action.FetchTodos ->
+                is Action.Todo.FetchTodos ->
                     store.dispatch(Action.Async {
-                        store.dispatch(Action.UpdateTodoList(repo.getTodos()))
+                        store.dispatch(Action.Todo.UpdateTodoList(repo.getTodos()))
                     })
             }
             val result = next(action)
