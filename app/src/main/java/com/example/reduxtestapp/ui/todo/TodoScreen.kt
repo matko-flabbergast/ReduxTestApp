@@ -41,7 +41,7 @@ import org.koin.compose.koinInject
 import org.reduxkotlin.Store
 
 @RootNavGraph
-@Destination(style = TodoTransitions::class)
+@Destination
 @Composable
 fun TodoScreen(
     navigator: DestinationsNavigator,
