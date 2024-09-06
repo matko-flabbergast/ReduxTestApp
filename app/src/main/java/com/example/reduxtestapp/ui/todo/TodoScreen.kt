@@ -32,20 +32,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
-import com.example.reduxtestapp.redux.TodoUiData
-import com.example.reduxtestapp.data.model.todo.TodoItem
+import com.example.reduxtestapp.data.model.todo.asPresentation
 import com.example.reduxtestapp.ui.todo.transitions.TodoTransitions
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.compose.koinInject
 import org.reduxkotlin.Store
-
-
-object TodoMapper {
-    fun mapDataToUi(todos: List<TodoItem>) =
-        todos.map { todo -> TodoUiData(todo.text, todo.isCompleted) }
-}
 
 @RootNavGraph
 @Destination(style = TodoTransitions::class)
@@ -58,7 +51,7 @@ fun TodoScreen(
 
 
     var uiState by remember {
-        mutableStateOf(TodoMapper.mapDataToUi(AppState().todoList))
+        mutableStateOf(store.state.todoList.asPresentation())
     }
 
     var triggerDialog by remember {
@@ -66,7 +59,7 @@ fun TodoScreen(
     }
 
     store.subscribe {
-        uiState = TodoMapper.mapDataToUi(store.state.todoList)
+        uiState = store.state.todoList.asPresentation()
     }
 
     // initial fetch of todos
