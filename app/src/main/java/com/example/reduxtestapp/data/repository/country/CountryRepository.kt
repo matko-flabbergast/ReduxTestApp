@@ -8,4 +8,6 @@ interface CountryRepository {
 
     suspend fun getAllCountries(): Either<ErrorState, List<Country>>
 
+    suspend fun getCountries(query: String): Either<ErrorState, List<Country>>
+
 }

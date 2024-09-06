@@ -1,14 +1,12 @@
 
 package com.example.reduxtestapp
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
@@ -79,7 +77,7 @@ private fun MyBottomNav(
 ) {
     val currentDestination = destinationsNavigator.currentDestinationAsState().value
         ?: NavGraphs.root.startDestination
-    NavigationBar {
+    NavigationBar (modifier){
         BottomBarDestination.entries.forEach { destination ->
             NavigationBarItem(
                 selected = currentDestination == destination.direction,
