@@ -7,7 +7,7 @@ import com.example.reduxtestapp.redux.AppState
 import org.reduxkotlin.Dispatcher
 import org.reduxkotlin.Store
 
-class RepoMiddleware (
+class TodoMiddleware (
     private val repo: TodoRepository,
 ) {
 

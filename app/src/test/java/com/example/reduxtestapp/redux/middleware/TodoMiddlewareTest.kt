@@ -4,7 +4,7 @@ import com.example.reduxtestapp.data.model.TodoItem
 import com.example.reduxtestapp.data.repository.TodoRepository
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
-import com.example.reduxtestapp.redux.todosReducer
+import com.example.reduxtestapp.redux.rootReducer
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -16,17 +16,17 @@ import org.reduxkotlin.Store
 import org.reduxkotlin.applyMiddleware
 import org.reduxkotlin.createThreadSafeStore
 
-class RepoMiddlewareTest {
+class TodoMiddlewareTest {
     private val repo = mockk<TodoRepository>()
     private val testDispatcher = StandardTestDispatcher()
 
     // UNDER TEST
-    private val middleware = RepoMiddleware(repo)
+    private val middleware = TodoMiddleware(repo)
 
     private fun createStore(): Store<AppState> =
         createThreadSafeStore(
             reducer = { state, action ->
-                todosReducer(state, action)
+                rootReducer(state, action)
             },
             preloadedState = AppState(),
             enhancer = applyMiddleware(

@@ -17,7 +17,7 @@ import kotlinx.serialization.json.Json
 const val TODO_NAME = "todos"
 val TODO_PREFERENCES_KEY = stringPreferencesKey("todo_preferences_key")
 
-data class TodoRepositoryImplementation (
+data class TodoRepositoryImpl (
     private val context: Context
 ) : TodoRepository {
 
