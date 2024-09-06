@@ -4,53 +4,86 @@ import com.example.reduxtestapp.data.model.country.Country
 import com.example.reduxtestapp.data.model.todo.TodoItem
 
 data class AppState (
-    val todoList: List<TodoItem> = listOf(),
-    val countryList: List<Country> = listOf(),
-    val isError: Boolean = false,
-    val visibilityFilter: VisibilityFilter = VisibilityFilter.ALL
+    val todoState: TodoState = TodoState(),
+    val countryState: CountryState = CountryState(),
 )
 
 fun rootReducer(state: AppState, action: Any): AppState {
-    return when (action) {
-        is Action.Todo -> todosReducer(state, action)
-        is Action.Country -> countryReducer(state, action)
-        is Action.Error -> state.copy(
-            isError = true
-        )
-        else -> state
-    }
+    return AppState(
+        todoState = todosReducer(state, action),
+        countryState = countryReducer(state, action),
+    )
 }
 
-fun countryReducer(state: AppState, action: Action.Country): AppState {
+fun countryReducer(state: AppState, action: Any): CountryState {
     return when (action) {
         is Action.Country.UpdateCountryList -> {
-            state.copy(
+            state.countryState.copy(
                 countryList = action.items,
-                isError = false
+                status = CountryState.Status.SUCCESS
             )
         }
-        else -> state.copy(
-            isError = false
-        )
+        is Action.Country.Error -> {
+            state.countryState.copy(
+                status = CountryState.Status.ERROR
+            )
+        }
+        is Action.Country.GetCountries -> {
+            state.countryState.copy(
+                status = CountryState.Status.PENDING
+            )
+        }
+        is Action.Country.SearchCountries -> {
+            state.countryState.copy(
+                status = CountryState.Status.PENDING
+            )
+        }
+        else -> state.countryState
     }
 }
 
-fun todosReducer(state: AppState, action: Action.Todo): AppState {
+fun todosReducer(state: AppState, action: Any): TodoState {
     return when (action) {
         is Action.Todo.UpdateTodoList -> {
-            state.copy(
+            state.todoState.copy(
                 todoList = action.items,
-                isError = false
+                status = TodoState.Status.SUCCESS
             )
         }
-        else -> state.copy(
-            isError = false
-        )
+        is Action.Todo.Error -> {
+            state.todoState.copy(
+                status = TodoState.Status.ERROR
+            )
+        }
+        is Action.Todo.AddTodo -> {
+            state.todoState.copy(
+                status = TodoState.Status.PENDING
+            )
+        }
+        is Action.Todo.ToggleTodo -> {
+            state.todoState.copy(
+                status = TodoState.Status.PENDING
+            )
+        }
+        is Action.Todo.FetchTodos -> {
+            state.todoState.copy(
+                status = TodoState.Status.PENDING
+            )
+        }
+        else -> state.todoState
     }
 }
 
-enum class VisibilityFilter {
-    ALL,
-    COMPLETED,
-    UNCOMPLETED
+data class TodoState (
+    val todoList: List<TodoItem> = listOf(),
+    val status: Status = Status.SUCCESS,
+) {
+    enum class Status { SUCCESS, PENDING, ERROR }
+}
+
+data class CountryState(
+    val countryList: List<Country> = listOf(),
+    val status: Status = Status.SUCCESS,
+) {
+    enum class Status { SUCCESS, PENDING, ERROR }
 }

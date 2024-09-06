@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.data.model.todo.asPresentation
-import com.example.reduxtestapp.ui.todo.transitions.TodoTransitions
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -51,7 +50,7 @@ fun TodoScreen(
 
 
     var uiState by remember {
-        mutableStateOf(store.state.todoList.asPresentation())
+        mutableStateOf(store.state.todoState.todoList.asPresentation())
     }
 
     var triggerDialog by remember {
@@ -59,7 +58,7 @@ fun TodoScreen(
     }
 
     store.subscribe {
-        uiState = store.state.todoList.asPresentation()
+        uiState = store.state.todoState.todoList.asPresentation()
     }
 
     // initial fetch of todos

@@ -7,25 +7,34 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.reduxtestapp.data.model.country.asPresentation
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
-import com.example.reduxtestapp.ui.home.transitions.HomeTransitions
+import com.example.reduxtestapp.redux.CountryState
+import com.example.reduxtestapp.ui.theme.ReduxTestAppTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
+import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 import org.reduxkotlin.Store
 
@@ -36,82 +45,104 @@ fun CountryScreen(
     modifier: Modifier = Modifier,
     store: Store<AppState> = koinInject(),
 ) {
-
     var uiState by remember {
-        mutableStateOf(store.state.countryList.asPresentation())
+        mutableStateOf(CountryViewState(
+            status = CountryState.Status.PENDING
+        ))
     }
 
-    var isCountriesLoading by remember {
-        mutableStateOf(false)
+    store.subscribe{
+        uiState = store.state.toCountryViewState()
     }
 
-    var isError by remember {
-        mutableStateOf(false)
-    }
+    CountryContent(
+        uiState = uiState,
+        modifier = modifier,
+        onSendSearchQuery = {
+            store.dispatch(Action.Country.SearchCountries(it))
+        },
+        onErrorClick = {
+            store.dispatch(Action.Country.GetCountries)
+        }
+    )
+}
 
-    store.subscribe {
-        uiState = store.state.countryList.asPresentation()
-        isCountriesLoading = false
-        isError = store.state.isError
-    }
 
-    store.dispatch(Action.Country.GetCountries).also { isCountriesLoading = true }
+
+@Composable
+private fun CountryContent(
+    uiState: CountryViewState,
+    modifier: Modifier = Modifier,
+    onSendSearchQuery: (String) -> Unit,
+    onErrorClick: () -> Unit,
+) {
 
     Scaffold (modifier = modifier){ padding ->
-        Column{
-            Text("Title")
-            if (!isError) {
-                CountryList(
-                    countryItems = uiState,
-                    isLoading = isCountriesLoading,
-                    modifier = Modifier.padding(padding)
-                )
-            } else {
-                ErrorButton(
-                    modifier = Modifier.fillMaxSize(),
-                    onClick = {
-                        store.dispatch(Action.Country.GetCountries).also { isCountriesLoading = true }
-                    }
-                )
+        Column (
+            modifier = modifier.padding(padding)
+        ){
+            var searchQuery by remember {
+                mutableStateOf("")
             }
-
+            SearchBar(
+                searchQuery = searchQuery,
+                onSendSearchQuery = onSendSearchQuery,
+                onSearchChanged = {
+                    searchQuery = it
+                },
+                modifier = Modifier.padding(16.dp)
+            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = modifier.fillMaxSize()
+            ){
+                when (uiState.status) {
+                    CountryState.Status.PENDING -> {
+                        CircularProgressIndicator()
+                    }
+                    CountryState.Status.SUCCESS -> {
+                        CountryList(
+                            countryItems = uiState.countryList,
+                        )
+                    }
+                    CountryState.Status.ERROR -> {
+                        ErrorButton(
+                            modifier = Modifier.fillMaxSize(),
+                            onClick = onErrorClick
+                        )
+                    }
+                }
+            }
 
         }
 
     }
-
-
-
 }
 @Composable
 private fun CountryList(
     countryItems: List<CountryUiData>,
-    isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Column (
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = modifier.fillMaxSize()
-    ){
-        if (!isLoading) {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxSize()
+    if (countryItems.isNotEmpty()) {
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = modifier.fillMaxSize()
 
-            ) {
-                items(countryItems) { item ->
-                    CountryItem(item)
-                }
+        ) {
+            items(countryItems) { item ->
+                CountryItem(item)
             }
-        } else {
-            CircularProgressIndicator()
         }
-
+    } else {
+        Text(
+            text = "No countries found for your search",
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxSize()
+        )
     }
-
-
 }
+
 @Composable
 private fun CountryItem(
     countryData: CountryUiData,
@@ -145,3 +176,62 @@ private fun ErrorButton(
         }
     }
 }
+
+@Composable
+private fun SearchBar(
+    searchQuery: String,
+    onSearchChanged: (String) -> Unit,
+    onSendSearchQuery: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LaunchedEffect(key1 = searchQuery) {
+        delay(1000L)
+        onSendSearchQuery(searchQuery)
+    }
+
+    TextField(
+        value = searchQuery,
+        onValueChange = onSearchChanged,
+        placeholder = {
+            Text("Search for country...")
+        },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = null
+            )
+        },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done
+        ),
+        modifier = modifier.fillMaxWidth()
+    )
+}
+
+@Preview (group = "Screen")
+@Composable
+private fun CountryPreviewSuccess() {
+    ReduxTestAppTheme {
+        val mockUiState = CountryViewState(
+            countryList = listOf(
+                CountryUiData(
+                    "Croatia",
+                    hashMapOf("hrv" to "Hrvatski")
+                ),
+                CountryUiData(
+                        "England",
+                hashMapOf("eng" to "English")
+            )
+            ),
+            status = CountryState.Status.SUCCESS
+
+        )
+        CountryContent(
+            uiState = mockUiState,
+            onSendSearchQuery = {},
+            onErrorClick = {}
+        )
+    }
+}
+
+

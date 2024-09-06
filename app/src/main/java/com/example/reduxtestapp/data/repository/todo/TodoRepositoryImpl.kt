@@ -6,7 +6,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.reduxtestapp.redux.VisibilityFilter
 import com.example.reduxtestapp.data.model.todo.TodoItem
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -22,7 +21,7 @@ data class TodoRepositoryImpl (
 ) : TodoRepository {
 
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = TODO_NAME)
-    override suspend fun getTodos(visibilityFilter: VisibilityFilter) =
+    override suspend fun getTodos() =
         context.dataStore.data.map { preferences ->
             Json.decodeFromString<List<TodoItem>>(
                 preferences[TODO_PREFERENCES_KEY] ?: "[]"

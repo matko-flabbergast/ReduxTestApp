@@ -11,7 +11,6 @@ import org.reduxkotlin.Store
 class CountryMiddleware (
     private val repo: CountryRepository
 ) {
-
     fun countryMiddleware(store: Store<AppState>) = { next: Dispatcher ->
         { action: Any ->
 
@@ -26,8 +25,31 @@ class CountryMiddleware (
                             .onLeft { error ->
                                 when (error) {
                                     is ErrorState.CountriesError -> {
+                                        Log.e("country", "countryMiddleware: error occurred ${error.message}")
+                                        store.dispatch(Action.Country.Error(error.message))
+                                    }
+                                    is ErrorState.EmptyListError -> {
+                                        store.dispatch(Action.Country.UpdateCountryList(listOf()))
+                                    }
+                                }
+                            }
+                    })
+                }
+                is Action.Country.SearchCountries -> {
+                    store.dispatch(Action.Async{
+                        val networkResult = repo.getCountries(action.query)
+                        networkResult
+                            .onRight { countryList ->
+                                store.dispatch(Action.Country.UpdateCountryList(countryList))
+                            }
+                            .onLeft { error ->
+                                when (error) {
+                                    is ErrorState.CountriesError -> {
                                         Log.d("country", "countryMiddleware: error occurred ${error.message}")
-                                        store.dispatch(Action.Error(error.message))
+                                        store.dispatch(Action.Country.Error(error.message))
+                                    }
+                                    is ErrorState.EmptyListError -> {
+                                        store.dispatch(Action.Country.UpdateCountryList(listOf()))
                                     }
                                 }
                             }
