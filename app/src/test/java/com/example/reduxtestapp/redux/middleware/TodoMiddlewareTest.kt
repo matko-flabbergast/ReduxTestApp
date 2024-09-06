@@ -1,8 +1,8 @@
 package com.example.reduxtestapp.redux.middleware
 
-import com.example.reduxtestapp.data.model.TodoItem
-import com.example.reduxtestapp.data.repository.TodoRepository
+import com.example.reduxtestapp.data.model.todo.TodoItem
 import com.example.reduxtestapp.redux.Action
+import com.example.reduxtestapp.data.repository.todo.TodoRepository
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.redux.rootReducer
 import io.mockk.coEvery
