@@ -89,6 +89,7 @@ dependencies {
     testImplementation("androidx.test:core:1.5.0")
     implementation("io.arrow-kt:arrow-core:1.2.4")
     implementation("io.arrow-kt:arrow-fx-coroutines:1.2.4")
+    implementation("io.coil-kt:coil-compose:2.7.0")
     testImplementation(libs.junit.jupiter)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

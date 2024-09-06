@@ -30,7 +30,7 @@ import org.koin.compose.koinInject
 import org.reduxkotlin.Store
 
 @RootNavGraph
-@Destination(style = HomeTransitions::class)
+@Destination
 @Composable
 fun CountryScreen(
     modifier: Modifier = Modifier,
