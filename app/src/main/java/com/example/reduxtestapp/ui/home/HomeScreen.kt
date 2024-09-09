@@ -27,10 +27,8 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 @Composable
 fun HomeScreen(
     navigator: DestinationsNavigator,
-    modifier: Modifier = Modifier) {
-    Scaffold (
-        modifier = modifier
-    ){ padding ->
+) {
+    Scaffold { padding ->
         TitleSection(
             modifier = Modifier.padding(padding)
         )

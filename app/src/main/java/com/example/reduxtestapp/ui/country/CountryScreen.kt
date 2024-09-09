@@ -32,8 +32,9 @@ import androidx.compose.ui.unit.dp
 import com.example.reduxtestapp.R
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
-import com.example.reduxtestapp.redux.CountryState
+import com.example.reduxtestapp.redux.state.CountryState
 import com.example.reduxtestapp.ui.theme.ReduxTestAppTheme
+import com.example.reduxtestapp.util.collectState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import kotlinx.coroutines.delay
@@ -44,22 +45,13 @@ import org.reduxkotlin.Store
 @Destination
 @Composable
 fun CountryScreen(
-    modifier: Modifier = Modifier,
     store: Store<AppState> = koinInject(),
 ) {
-    var uiState by remember {
-        mutableStateOf(CountryViewState(
-            status = CountryState.Status.PENDING
-        ))
-    }
 
-    store.subscribe{
-        uiState = store.state.toCountryViewState()
-    }
+    val uiState = store.collectState(AppState::toCountryViewState)
 
     CountryContent(
         uiState = uiState,
-        modifier = modifier,
         onSendSearchQuery = {
             store.dispatch(Action.Country.SearchCountries(it))
         },
@@ -125,7 +117,7 @@ private fun CountryContent(
 }
 @Composable
 private fun CountryList(
-    countryItems: List<CountryUiData>,
+    countryItems: List<CountryItem>,
     modifier: Modifier = Modifier
 ) {
     if (countryItems.isNotEmpty()) {
@@ -149,7 +141,7 @@ private fun CountryList(
 
 @Composable
 private fun CountryItem(
-    countryData: CountryUiData,
+    countryData: CountryItem,
     modifier: Modifier = Modifier
 ) {
 
@@ -222,11 +214,11 @@ private fun CountryPreviewSuccess() {
     ReduxTestAppTheme {
         val mockUiState = CountryViewState(
             countryList = listOf(
-                CountryUiData(
+                CountryItem(
                     "Croatia",
                     hashMapOf("hrv" to "Hrvatski")
                 ),
-                CountryUiData(
+                CountryItem(
                         "England",
                 hashMapOf("eng" to "English")
             )

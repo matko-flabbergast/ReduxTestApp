@@ -1,5 +1,7 @@
 package com.example.reduxtestapp.di
 
+import com.example.reduxtestapp.common.DefaultLogger
+import com.example.reduxtestapp.common.Logger
 import com.example.reduxtestapp.data.network.BASE_URL
 import com.example.reduxtestapp.data.network.CountriesApiService
 import com.example.reduxtestapp.data.repository.country.CountryRepository
@@ -25,7 +27,7 @@ val sharedModule = module {
     }
 
     single<CountryRepository>{
-        CountryRepositoryImpl(get())
+        CountryRepositoryImpl(get(), get())
     }
 
     single<Store<AppState>>{
@@ -35,9 +37,9 @@ val sharedModule = module {
             },
             preloadedState = AppState(),
             enhancer = applyMiddleware(
-                get<TodoMiddleware>()::todoMiddleware,
-                get<CountryMiddleware>()::countryMiddleware,
-                get<AsyncMiddleware>()::asyncMiddleware
+                get<TodoMiddleware>()::launchMiddleware,
+                get<CountryMiddleware>()::launchMiddleware,
+                get<AsyncMiddleware>()::launchMiddleware
             )
         )
     }
@@ -50,6 +52,7 @@ val sharedModule = module {
 
     single<CountryMiddleware>{
         CountryMiddleware(
+            get(),
             get()
         )
     }
@@ -67,5 +70,9 @@ val sharedModule = module {
 
     single<CountriesApiService> {
         get<Retrofit>().create(CountriesApiService::class.java)
+    }
+
+    single<Logger> {
+        DefaultLogger
     }
 }

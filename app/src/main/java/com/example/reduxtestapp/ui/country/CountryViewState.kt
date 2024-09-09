@@ -1,11 +1,11 @@
 package com.example.reduxtestapp.ui.country
 
-import com.example.reduxtestapp.data.model.country.asPresentation
+import com.example.reduxtestapp.data.model.country.CountryDto
 import com.example.reduxtestapp.redux.AppState
-import com.example.reduxtestapp.redux.CountryState
+import com.example.reduxtestapp.redux.state.CountryState
 
 data class CountryViewState (
-    val countryList: List<CountryUiData> = listOf(),
+    val countryList: List<CountryItem> = listOf(),
     val status: CountryState.Status = CountryState.Status.SUCCESS,
 )
 
@@ -14,7 +14,14 @@ fun AppState.toCountryViewState() = CountryViewState(
     status = countryState.status
 )
 
-data class CountryUiData (
+data class CountryItem (
     val name: String,
-    val languages: HashMap<String, String>
+    val languages: Map<String, String>
 )
+
+fun CountryDto.asPresentation() = CountryItem(
+    name = name.common,
+    languages = languages
+)
+
+fun List<CountryDto>.asPresentation(): List<CountryItem> = map { it.asPresentation() }

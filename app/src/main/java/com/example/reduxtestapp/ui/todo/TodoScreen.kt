@@ -20,18 +20,15 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
-import com.example.reduxtestapp.redux.TodoState
+import com.example.reduxtestapp.redux.state.TodoState
 import com.example.reduxtestapp.ui.destinations.AddTodoDialogDestination
+import com.example.reduxtestapp.util.collectState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -43,20 +40,11 @@ import org.reduxkotlin.Store
 @Composable
 fun TodoScreen(
     navigator: DestinationsNavigator,
-    modifier: Modifier = Modifier,
     store: Store<AppState> = koinInject(),
     ) {
 
 
-    var uiState by remember {
-        mutableStateOf(TodoViewState(
-            status = TodoState.Status.PENDING
-        ))
-    }
-
-    store.subscribe {
-        uiState = store.state.toTodoViewState()
-    }
+    val uiState = store.collectState(AppState::toTodoViewState)
 
     // initial fetch of todos
     LaunchedEffect(Unit) {
@@ -65,7 +53,6 @@ fun TodoScreen(
 
     TodoContent(
         uiState = uiState,
-        modifier = modifier,
         onToggleTodo = { index ->
             store.dispatch(Action.Todo.ToggleTodo(index))
         },
@@ -140,7 +127,7 @@ private fun AddTodoButton(
 
 @Composable
 private fun TodoList (
-    todoItems: List<TodoUiData>,
+    todoItems: List<TodoItem>,
     onCompleteChanged: (Int, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -194,9 +181,9 @@ private fun TodoItem(
 private fun TodoContentPreview() {
     val mockUiState = TodoViewState(
         listOf(
-            TodoUiData("Todo 1", false),
-            TodoUiData("Todo 2", true),
-            TodoUiData("Todo 3", false),
+            TodoItem("Todo 1", false),
+            TodoItem("Todo 2", true),
+            TodoItem("Todo 3", false),
         ),
         status = TodoState.Status.SUCCESS
     )
