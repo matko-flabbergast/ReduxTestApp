@@ -1,33 +1,18 @@
 package com.example.reduxtestapp.redux
 
-import com.example.reduxtestapp.data.model.todo.TodoItem
+import com.example.reduxtestapp.redux.reducers.countryReducer
+import com.example.reduxtestapp.redux.reducers.todosReducer
+import com.example.reduxtestapp.redux.state.CountryState
+import com.example.reduxtestapp.redux.state.TodoState
 
 data class AppState (
-    val todoList: List<TodoItem> = listOf(),
-    val visibilityFilter: VisibilityFilter = VisibilityFilter.ALL
+    val todoState: TodoState = TodoState(),
+    val countryState: CountryState = CountryState(),
 )
 
-fun todosReducer(state: AppState, action: Any): AppState {
-
-    return when (action) {
-        is Action.Todo.UpdateTodoList -> {
-            state.copy(
-                todoList = action.items
-            )
-        }
-        else -> state
-    }
-}
-
-
-
-data class TodoUiData (
-    val text: String,
-    val isCompleted: Boolean
-)
-
-enum class VisibilityFilter {
-    ALL,
-    COMPLETED,
-    UNCOMPLETED
+fun rootReducer(state: AppState, action: Any): AppState {
+    return AppState(
+        todoState = todosReducer(state, action),
+        countryState = countryReducer(state, action),
+    )
 }

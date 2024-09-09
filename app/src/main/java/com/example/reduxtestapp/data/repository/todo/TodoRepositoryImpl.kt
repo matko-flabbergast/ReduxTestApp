@@ -1,4 +1,4 @@
-package com.example.reduxtestapp.data.repository
+package com.example.reduxtestapp.data.repository.todo
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -6,8 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.reduxtestapp.redux.VisibilityFilter
-import com.example.reduxtestapp.data.model.TodoItem
+import com.example.reduxtestapp.data.model.todo.TodoDto
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -17,34 +16,34 @@ import kotlinx.serialization.json.Json
 const val TODO_NAME = "todos"
 val TODO_PREFERENCES_KEY = stringPreferencesKey("todo_preferences_key")
 
-data class TodoRepositoryImplementation (
+data class TodoRepositoryImpl (
     private val context: Context
 ) : TodoRepository {
 
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = TODO_NAME)
-    override suspend fun getTodos(visibilityFilter: VisibilityFilter) =
+    override suspend fun getTodos() =
         context.dataStore.data.map { preferences ->
-            Json.decodeFromString<List<TodoItem>>(
+            Json.decodeFromString<List<TodoDto>>(
                 preferences[TODO_PREFERENCES_KEY] ?: "[]"
             )
         }.first()
 
-    override suspend fun insertTodo(todoItem: TodoItem): List<TodoItem> {
-        var newList: List<TodoItem>? = null
+    override suspend fun insertTodo(todoDto: TodoDto): List<TodoDto> {
+        var newList: List<TodoDto>? = null
         context.dataStore.edit { preferences ->
-            val list = Json.decodeFromString<List<TodoItem>>(
+            val list = Json.decodeFromString<List<TodoDto>>(
                 preferences[TODO_PREFERENCES_KEY] ?: "[]"
-            ).toMutableList().apply { add(todoItem) }
+            ).toMutableList().apply { add(todoDto) }
             preferences[TODO_PREFERENCES_KEY] = Json.encodeToString(list)
             newList = list
         }
         return newList ?: listOf()
     }
 
-    override suspend fun toggleTodo(index: Int): List<TodoItem> {
-        var newList: List<TodoItem>? = null
+    override suspend fun toggleTodo(index: Int): List<TodoDto> {
+        var newList: List<TodoDto>? = null
         context.dataStore.edit { preferences ->
-            val list = Json.decodeFromString<List<TodoItem>>(
+            val list = Json.decodeFromString<List<TodoDto>>(
                 preferences[TODO_PREFERENCES_KEY] ?: "[]"
             ).toMutableList()
             list[index] = list[index].copy(

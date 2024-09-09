@@ -1,10 +1,10 @@
 package com.example.reduxtestapp.redux.middleware
 
-import com.example.reduxtestapp.data.model.TodoItem
-import com.example.reduxtestapp.data.repository.TodoRepository
+import com.example.reduxtestapp.data.model.todo.TodoDto
 import com.example.reduxtestapp.redux.Action
+import com.example.reduxtestapp.data.repository.todo.TodoRepository
 import com.example.reduxtestapp.redux.AppState
-import com.example.reduxtestapp.redux.todosReducer
+import com.example.reduxtestapp.redux.rootReducer
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -16,23 +16,23 @@ import org.reduxkotlin.Store
 import org.reduxkotlin.applyMiddleware
 import org.reduxkotlin.createThreadSafeStore
 
-class RepoMiddlewareTest {
+class TodoMiddlewareTest {
     private val repo = mockk<TodoRepository>()
     private val testDispatcher = StandardTestDispatcher()
 
     // UNDER TEST
-    private val middleware = RepoMiddleware(repo)
+    private val middleware = TodoMiddleware(repo)
 
     private fun createStore(): Store<AppState> =
         createThreadSafeStore(
             reducer = { state, action ->
-                todosReducer(state, action)
+                rootReducer(state, action)
             },
             preloadedState = AppState(),
             enhancer = applyMiddleware(
                 CheckDispatchedActionsMiddleware::actionsMiddleware,
-                middleware::todoMiddleware,
-                AsyncMiddleware()::asyncMiddleware
+                middleware::launchMiddleware,
+                AsyncMiddleware()::launchMiddleware
             )
         )
 
@@ -128,14 +128,14 @@ class RepoMiddlewareTest {
     fun `addTodo action updates state with added todo`() = runTest {
         val store = createStore()
         val testText = "Test Todo"
-        val testTodo = TodoItem(testText, false)
+        val testTodo = TodoDto(testText, false)
         coEvery { repo.insertTodo(any()) } returns listOf(
-            TodoItem(testText, false)
+            TodoDto(testText, false)
         )
         store.dispatch(Action.Todo.AddTodo(testText))
         advanceUntilIdle()
         store.subscribe {
-            assert(store.state.todoList.contains(testTodo)
+            assert(store.state.todoState.todoList.contains(testTodo)
             )
         }
 
@@ -146,14 +146,14 @@ class RepoMiddlewareTest {
     fun `toggleTodo action updates state with toggled todo`() = runTest {
         val store = createStore()
         val index = 0
-        val testTodo = TodoItem("Test Todo", false)
+        val testTodo = TodoDto("Test Todo", false)
         coEvery { repo.toggleTodo(any()) } returns listOf(
             testTodo
         )
         store.dispatch(Action.Todo.ToggleTodo(index))
         advanceUntilIdle()
         store.subscribe {
-            assert(store.state.todoList.contains(testTodo)
+            assert(store.state.todoState.todoList.contains(testTodo)
             )
         }
 

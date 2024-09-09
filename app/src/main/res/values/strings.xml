@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">ReduxTestApp</string>
+    <string name="home_screen">Home</string>
+    <string name="todo_screen">Todo</string>
+    <string name="country_screen">Country</string>
+    <string name="search_placeholder">Search for country...</string>
+    <string name="error_try_again">Try Again</string>
+    <string name="error_occurred">Error has happened :(</string>
+    <string name="no_countries_found">No countries found for your search</string>
+    <string name="add_todo">Add New Todo</string>
+    <string name="add_todo_placeholder">Todo Text</string>
+    <string name="add_todo_dialog_affirmative">Add</string>
 </resources>

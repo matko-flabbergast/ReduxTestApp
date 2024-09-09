@@ -4,113 +4,107 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
-import com.example.reduxtestapp.redux.TodoUiData
-import com.example.reduxtestapp.data.model.todo.TodoItem
-import com.example.reduxtestapp.ui.todo.transitions.TodoTransitions
+import com.example.reduxtestapp.redux.state.TodoState
+import com.example.reduxtestapp.ui.destinations.AddTodoDialogDestination
+import com.example.reduxtestapp.util.collectState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.compose.koinInject
 import org.reduxkotlin.Store
 
-
-object TodoMapper {
-    fun mapDataToUi(todos: List<TodoItem>) =
-        todos.map { todo -> TodoUiData(todo.text, todo.isCompleted) }
-}
-
 @RootNavGraph
-@Destination(style = TodoTransitions::class)
+@Destination
 @Composable
 fun TodoScreen(
     navigator: DestinationsNavigator,
-    modifier: Modifier = Modifier,
     store: Store<AppState> = koinInject(),
     ) {
 
 
-    var uiState by remember {
-        mutableStateOf(TodoMapper.mapDataToUi(AppState().todoList))
-    }
-
-    var triggerDialog by remember {
-        mutableStateOf(false)
-    }
-
-    store.subscribe {
-        uiState = TodoMapper.mapDataToUi(store.state.todoList)
-    }
+    val uiState = store.collectState(AppState::toTodoViewState)
 
     // initial fetch of todos
-    store.dispatch(Action.Todo.FetchTodos)
+    LaunchedEffect(Unit) {
+        store.dispatch(Action.Todo.FetchTodos)
+    }
+
+    TodoContent(
+        uiState = uiState,
+        onToggleTodo = { index ->
+            store.dispatch(Action.Todo.ToggleTodo(index))
+        },
+        onAddTodoButtonClicked = {
+            navigator.navigate(AddTodoDialogDestination)
+        }
+    )
+
+
+
+
+}
+
+@Composable
+private fun TodoContent(
+    uiState: TodoViewState,
+    modifier: Modifier = Modifier,
+    onToggleTodo: (Int) -> Unit,
+    onAddTodoButtonClicked: () -> Unit,
+) {
 
     Scaffold (
         floatingActionButton = {
-            AddTodoButton(onAddTodoClicked = {triggerDialog = true})
+            AddTodoButton(onAddTodoClicked = onAddTodoButtonClicked)
         }
     ) { padding ->
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(padding),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                "Todo App",
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(16.dp)
-            )
-            TodoList(
-                todoItems = uiState,
-                onCompleteChanged = { index, _ ->
-                    store.dispatch(Action.Todo.ToggleTodo(index))
+            when (uiState.status) {
+                TodoState.Status.SUCCESS -> {
+                    TodoList(
+                        todoItems = uiState.todoList,
+                        modifier = Modifier,
+                        onCompleteChanged = { index, _ ->
+                            onToggleTodo(index)
+                        }
+                    )
                 }
-            )
-        }
 
-    }
+                TodoState.Status.PENDING -> {
+                    CircularProgressIndicator()
+                }
 
-    if (triggerDialog) {
-        AddTodoDialog(
-            onConfirm = {text ->
-                store.dispatch(Action.Todo.AddTodo(text))
-                triggerDialog = false
-            },
-            onDismiss = {
-                triggerDialog = false
+                TodoState.Status.ERROR -> {}
             }
-        )
+        }
     }
-
 
 }
 
@@ -133,14 +127,14 @@ private fun AddTodoButton(
 
 @Composable
 private fun TodoList (
-    todoItems: List<TodoUiData>,
+    todoItems: List<TodoItem>,
     onCompleteChanged: (Int, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn (
         verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(8.dp)
     ) {
         itemsIndexed(todoItems) { index, todoItem ->
@@ -182,32 +176,17 @@ private fun TodoItem(
     }
 }
 
+@Preview
 @Composable
-private fun AddTodoDialog(
-    onConfirm: (String) -> Unit,
-    onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var text by remember {
-        mutableStateOf("")
-    }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(text = "Add New Todo") },
-        text = {
-            TextField(
-                value = text,
-                onValueChange = { text = it },
-                placeholder = {
-                    Text("Todo Text")
-                }
-            )
-        },
-        modifier = modifier,
-        confirmButton = {
-            TextButton(onClick = {onConfirm(text)}) {
-                Text(text = "Add")
-            }
-        }
+private fun TodoContentPreview() {
+    val mockUiState = TodoViewState(
+        listOf(
+            TodoItem("Todo 1", false),
+            TodoItem("Todo 2", true),
+            TodoItem("Todo 3", false),
+        ),
+        status = TodoState.Status.SUCCESS
     )
+    TodoContent(mockUiState, Modifier, {}, {})
+    
 }
