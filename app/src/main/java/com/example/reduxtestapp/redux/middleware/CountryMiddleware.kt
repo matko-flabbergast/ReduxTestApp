@@ -33,12 +33,12 @@ class CountryMiddleware (
                         }
                         .onLeft { error ->
                             when (error) {
-                                is ErrorState.CountriesError -> {
-                                    logError("countryMiddleware: error occurred ${error.message}")
-                                    store.dispatch(Action.Country.Error(error.message))
-                                }
                                 is ErrorState.EmptyListError -> {
                                     store.dispatch(Action.Country.UpdateCountryList(listOf()))
+                                }
+                                else -> {
+                                    logError("countryMiddleware: error occurred $error")
+                                    store.dispatch(Action.Country.Error())
                                 }
                             }
                         }
@@ -53,12 +53,12 @@ class CountryMiddleware (
                         }
                         .onLeft { error ->
                             when (error) {
-                                is ErrorState.CountriesError -> {
-                                    logError("countryMiddleware: error occurred ${error.message}")
-                                    store.dispatch(Action.Country.Error(error.message))
-                                }
                                 is ErrorState.EmptyListError -> {
                                     store.dispatch(Action.Country.UpdateCountryList(listOf()))
+                                }
+                                else -> {
+                                    logError("countryMiddleware: error occurred error")
+                                    store.dispatch(Action.Country.Error())
                                 }
                             }
                         }

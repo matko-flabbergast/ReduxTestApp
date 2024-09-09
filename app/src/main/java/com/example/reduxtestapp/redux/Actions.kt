@@ -10,7 +10,6 @@ sealed interface Action {
         data object FetchTodos: Todo
         data class UpdateTodoList(val items: List<TodoDto>): Todo
         data class Error(val message: String? = ""): Todo
-
     }
     sealed interface Country : Action {
         data object GetCountries: Country

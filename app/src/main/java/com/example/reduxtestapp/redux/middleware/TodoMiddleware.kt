@@ -21,7 +21,6 @@ class TodoMiddleware (
                     store.dispatch(Action.Todo.UpdateTodoList(newList))
                 })
             }
-
             is Action.Todo.ToggleTodo -> {
                 store.dispatch(Action.Async {
                     val newList = repo.toggleTodo(action.index)
