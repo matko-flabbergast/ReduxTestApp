@@ -6,13 +6,11 @@ import com.example.reduxtestapp.redux.TodoState
 
 data class TodoViewState (
     val todoList: List<TodoUiData> = listOf(),
-    val isAddTodoDialogShown: Boolean = false,
-    val status: TodoState.Status = TodoState.Status.PENDING
+    val status: TodoState.Status = TodoState.Status.SUCCESS
 )
 
 fun AppState.toTodoViewState() = TodoViewState(
     todoList = todoState.todoList.asPresentation(),
-    isAddTodoDialogShown = todoState.isAddTodoDialogShown,
     status = todoState.status
 )
 

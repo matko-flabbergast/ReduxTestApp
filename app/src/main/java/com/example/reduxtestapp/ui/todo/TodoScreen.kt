@@ -4,15 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
@@ -21,8 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,13 +26,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.reduxtestapp.R
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.redux.TodoState
+import com.example.reduxtestapp.ui.destinations.AddTodoDialogDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -65,24 +59,18 @@ fun TodoScreen(
     }
 
     // initial fetch of todos
-    if (uiState.todoList.isEmpty()) {
+    LaunchedEffect(Unit) {
         store.dispatch(Action.Todo.FetchTodos)
     }
 
     TodoContent(
         uiState = uiState,
         modifier = modifier,
-        onAddTodo = {text ->
-            store.dispatch(Action.Todo.AddTodo(text))
-        },
         onToggleTodo = { index ->
             store.dispatch(Action.Todo.ToggleTodo(index))
         },
         onAddTodoButtonClicked = {
-            store.dispatch(Action.Todo.AddTodoButtonClicked)
-        },
-        onAddTodoDialogDismissed = {
-            store.dispatch(Action.Todo.DismissAddTodoDialog)
+            navigator.navigate(AddTodoDialogDestination)
         }
     )
 
@@ -95,10 +83,8 @@ fun TodoScreen(
 private fun TodoContent(
     uiState: TodoViewState,
     modifier: Modifier = Modifier,
-    onAddTodo: (String) -> Unit,
     onToggleTodo: (Int) -> Unit,
     onAddTodoButtonClicked: () -> Unit,
-    onAddTodoDialogDismissed: () -> Unit,
 ) {
 
     Scaffold (
@@ -123,20 +109,14 @@ private fun TodoContent(
                         }
                     )
                 }
+
                 TodoState.Status.PENDING -> {
                     CircularProgressIndicator()
                 }
+
                 TodoState.Status.ERROR -> {}
             }
         }
-
-    }
-
-    if (uiState.isAddTodoDialogShown) {
-        AddTodoDialog(
-            onConfirm = onAddTodo,
-            onDismiss = onAddTodoDialogDismissed
-        )
     }
 
 }
@@ -209,36 +189,6 @@ private fun TodoItem(
     }
 }
 
-@Composable
-private fun AddTodoDialog(
-    onConfirm: (String) -> Unit,
-    onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var text by remember {
-        mutableStateOf("")
-    }
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.add_todo)) },
-        text = {
-            TextField(
-                value = text,
-                onValueChange = { text = it },
-                placeholder = {
-                    Text(stringResource(R.string.add_todo_placeholder))
-                }
-            )
-        },
-        modifier = modifier,
-        confirmButton = {
-            TextButton(onClick = {onConfirm(text)}) {
-                Text(stringResource(R.string.add_todo_dialog_affirmative))
-            }
-        }
-    )
-}
-
 @Preview
 @Composable
 private fun TodoContentPreview() {
@@ -250,6 +200,6 @@ private fun TodoContentPreview() {
         ),
         status = TodoState.Status.SUCCESS
     )
-    TodoContent(mockUiState, Modifier, {}, {}, {}, {})
+    TodoContent(mockUiState, Modifier, {}, {})
     
 }

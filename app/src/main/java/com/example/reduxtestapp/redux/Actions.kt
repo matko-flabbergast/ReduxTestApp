@@ -8,8 +8,6 @@ sealed interface Action {
         data class ToggleTodo(val index: Int): Todo
         data object FetchTodos: Todo
         data class UpdateTodoList(val items: List<TodoItem>): Todo
-        data object AddTodoButtonClicked
-        data object DismissAddTodoDialog
         data class Error(val message: String = ""): Todo
 
     }

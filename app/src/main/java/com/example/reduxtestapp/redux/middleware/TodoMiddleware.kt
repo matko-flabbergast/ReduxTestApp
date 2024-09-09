@@ -22,7 +22,6 @@ class TodoMiddleware (
                         )
                         store.dispatch(Action.Todo.UpdateTodoList(newList))
                     })
-                    store.dispatch(Action.Todo.DismissAddTodoDialog)
                 }
 
                 is Action.Todo.ToggleTodo -> {
@@ -30,7 +29,6 @@ class TodoMiddleware (
                         val newList = repo.toggleTodo(action.index)
                         store.dispatch(Action.Todo.UpdateTodoList(newList))
                     })
-                    store.dispatch(Action.Todo.DismissAddTodoDialog)
                 }
                 is Action.Todo.FetchTodos ->
                     store.dispatch(Action.Async {
