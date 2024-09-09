@@ -49,18 +49,6 @@ data class TodoRepositoryImpl (
     }
 
     override suspend fun toggleTodo(index: Int): List<TodoDto> {
-//        var newList: List<TodoDto>? = null
-//        context.dataStore.edit { preferences ->
-//            val list = Json.decodeFromString<List<TodoDto>>(
-//                preferences[TODO_PREFERENCES_KEY] ?: "[]"
-//            ).toMutableList()
-//            list[index] = list[index].copy(
-//                isCompleted = !list[index].isCompleted
-//            )
-//            preferences[TODO_PREFERENCES_KEY] = Json.encodeToString(list)
-//            newList = list
-//        }
-//        return newList ?: listOf()
         return makeChanges { oldList ->
             oldList[index] = oldList[index].copy(
                 isCompleted = !oldList[index].isCompleted
@@ -70,18 +58,6 @@ data class TodoRepositoryImpl (
     }
 
     override suspend fun editTodo(index: Int, newText: String): List<TodoDto> {
-//        var newList: List<TodoDto>? = null
-//        context.dataStore.edit { preferences ->
-//            val list = Json.decodeFromString<List<TodoDto>>(
-//                preferences[TODO_PREFERENCES_KEY] ?: "[]"
-//            ).toMutableList()
-//            list[index] = list[index].copy(
-//                text = newText
-//            )
-//            preferences[TODO_PREFERENCES_KEY] = Json.encodeToString(list)
-//            newList = list
-//        }
-//        return newList ?: listOf()
         return makeChanges { oldList ->
             oldList[index] = oldList[index].copy(
                 text = newText
@@ -91,16 +67,6 @@ data class TodoRepositoryImpl (
     }
 
     override suspend fun deleteTodo(index: Int): List<TodoDto> {
-//        var newList: List<TodoDto>? = null
-//        context.dataStore.edit { preferences ->
-//            val list = Json.decodeFromString<List<TodoDto>>(
-//                preferences[TODO_PREFERENCES_KEY] ?: "[]"
-//            ).toMutableList()
-//            list.removeAt(index)
-//            preferences[TODO_PREFERENCES_KEY] = Json.encodeToString(list)
-//            newList = list
-//        }
-//        return newList ?: listOf()
         return makeChanges { oldList ->
             oldList.removeAt(index)
             oldList
