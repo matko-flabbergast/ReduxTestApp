@@ -70,6 +70,16 @@ fun todosReducer(state: AppState, action: Any): TodoState {
                 status = TodoState.Status.PENDING
             )
         }
+        is Action.Todo.AddTodoButtonClicked -> {
+            state.todoState.copy(
+                isAddTodoDialogShown = true
+            )
+        }
+        is Action.Todo.DismissAddTodoDialog -> {
+            state.todoState.copy(
+                isAddTodoDialogShown = false
+            )
+        }
         else -> state.todoState
     }
 }
@@ -77,6 +87,7 @@ fun todosReducer(state: AppState, action: Any): TodoState {
 data class TodoState (
     val todoList: List<TodoItem> = listOf(),
     val status: Status = Status.SUCCESS,
+    val isAddTodoDialogShown: Boolean = false
 ) {
     enum class Status { SUCCESS, PENDING, ERROR }
 }

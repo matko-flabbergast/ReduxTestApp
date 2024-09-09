@@ -15,21 +15,27 @@ class TodoMiddleware (
         { action: Any ->
 
             when (action) {
-                is Action.Todo.AddTodo ->
+                is Action.Todo.AddTodo -> {
                     store.dispatch(Action.Async {
                         val newList = repo.insertTodo(
                             TodoItem(action.text, false)
                         )
                         store.dispatch(Action.Todo.UpdateTodoList(newList))
                     })
-                is Action.Todo.ToggleTodo ->
+                    store.dispatch(Action.Todo.DismissAddTodoDialog)
+                }
+
+                is Action.Todo.ToggleTodo -> {
                     store.dispatch(Action.Async {
                         val newList = repo.toggleTodo(action.index)
                         store.dispatch(Action.Todo.UpdateTodoList(newList))
                     })
+                    store.dispatch(Action.Todo.DismissAddTodoDialog)
+                }
                 is Action.Todo.FetchTodos ->
                     store.dispatch(Action.Async {
-                        store.dispatch(Action.Todo.UpdateTodoList(repo.getTodos()))
+                        val todos = repo.getTodos()
+                        store.dispatch(Action.Todo.UpdateTodoList(todos))
                     })
             }
             val result = next(action)
