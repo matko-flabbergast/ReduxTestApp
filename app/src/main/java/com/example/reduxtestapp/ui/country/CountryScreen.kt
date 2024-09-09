@@ -24,10 +24,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.reduxtestapp.R
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.redux.CountryState
@@ -62,7 +64,7 @@ fun CountryScreen(
             store.dispatch(Action.Country.SearchCountries(it))
         },
         onErrorClick = {
-            store.dispatch(Action.Country.GetCountries)
+            store.dispatch(Action.Country.SearchCountries(it))
         }
     )
 }
@@ -74,7 +76,7 @@ private fun CountryContent(
     uiState: CountryViewState,
     modifier: Modifier = Modifier,
     onSendSearchQuery: (String) -> Unit,
-    onErrorClick: () -> Unit,
+    onErrorClick: (String) -> Unit,
 ) {
 
     Scaffold (modifier = modifier){ padding ->
@@ -109,7 +111,9 @@ private fun CountryContent(
                     CountryState.Status.ERROR -> {
                         ErrorButton(
                             modifier = Modifier.fillMaxSize(),
-                            onClick = onErrorClick
+                            onClick = {
+                                onErrorClick(searchQuery)
+                            }
                         )
                     }
                 }
@@ -136,7 +140,7 @@ private fun CountryList(
         }
     } else {
         Text(
-            text = "No countries found for your search",
+            text = stringResource(R.string.no_countries_found),
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxSize()
         )
@@ -168,11 +172,15 @@ private fun ErrorButton(
         verticalArrangement = Arrangement.Center,
         modifier = modifier.fillMaxSize()
     ) {
-        Text("Error has happened :(", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Text(
+            stringResource(R.string.error_occurred),
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
         Button(
             onClick = onClick
         ) {
-            Text("Try Again")
+            Text(stringResource(R.string.error_try_again))
         }
     }
 }
@@ -193,7 +201,7 @@ private fun SearchBar(
         value = searchQuery,
         onValueChange = onSearchChanged,
         placeholder = {
-            Text("Search for country...")
+            Text(stringResource(R.string.search_placeholder))
         },
         leadingIcon = {
             Icon(

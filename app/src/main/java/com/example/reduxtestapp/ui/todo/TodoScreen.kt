@@ -28,8 +28,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.reduxtestapp.R
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.data.model.todo.asPresentation
@@ -74,13 +76,6 @@ fun TodoScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            Text(
-                "Todo App",
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .padding(16.dp)
-            )
             TodoList(
                 todoItems = uiState,
                 onCompleteChanged = { index, _ ->
@@ -103,6 +98,13 @@ fun TodoScreen(
         )
     }
 
+
+}
+
+@Composable
+private fun TodoContent(
+    modifier: Modifier = Modifier
+) {
 
 }
 
@@ -185,20 +187,20 @@ private fun AddTodoDialog(
     }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Add New Todo") },
+        title = { Text(stringResource(R.string.add_todo)) },
         text = {
             TextField(
                 value = text,
                 onValueChange = { text = it },
                 placeholder = {
-                    Text("Todo Text")
+                    Text(stringResource(R.string.add_todo_placeholder))
                 }
             )
         },
         modifier = modifier,
         confirmButton = {
             TextButton(onClick = {onConfirm(text)}) {
-                Text(text = "Add")
+                Text(stringResource(R.string.add_todo_dialog_affirmative))
             }
         }
     )
