@@ -11,27 +11,42 @@ class TodoMiddleware (
     private val repo: TodoRepository,
 ) : Middleware() {
 
+    private fun launchAsyncAndDispatchUpdate(store: Store<AppState>, newListGetter: suspend () -> List<TodoDto>) {
+        store.dispatch(Action.Async{
+            val newList = newListGetter()
+            store.dispatch(Action.Todo.UpdateTodoList(newList))
+        })
+    }
+
     override fun middleware(store: Store<AppState>, action: Any) {
         when (action) {
             is Action.Todo.AddTodo -> {
-                store.dispatch(Action.Async {
-                    val newList = repo.insertTodo(
+                launchAsyncAndDispatchUpdate(store){
+                    repo.insertTodo(
                         TodoDto(action.text, false)
                     )
-                    store.dispatch(Action.Todo.UpdateTodoList(newList))
-                })
+                }
             }
             is Action.Todo.ToggleTodo -> {
-                store.dispatch(Action.Async {
-                    val newList = repo.toggleTodo(action.index)
-                    store.dispatch(Action.Todo.UpdateTodoList(newList))
-                })
+                launchAsyncAndDispatchUpdate(store){
+                    repo.toggleTodo(action.index)
+                }
             }
-            is Action.Todo.FetchTodos ->
-                store.dispatch(Action.Async {
-                    val todos = repo.getTodos()
-                    store.dispatch(Action.Todo.UpdateTodoList(todos))
-                })
+            is Action.Todo.FetchTodos -> {
+                launchAsyncAndDispatchUpdate(store){
+                    repo.getTodos()
+                }
+            }
+            is Action.Todo.EditTodo -> {
+                launchAsyncAndDispatchUpdate(store){
+                    repo.editTodo(action.index, action.text)
+                }
+            }
+            is Action.Todo.RemoveTodo -> {
+                launchAsyncAndDispatchUpdate(store){
+                    repo.deleteTodo(action.index)
+                }
+            }
         }
     }
 

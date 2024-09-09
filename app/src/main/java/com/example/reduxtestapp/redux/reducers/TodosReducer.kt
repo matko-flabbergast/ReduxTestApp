@@ -32,6 +32,16 @@ fun todosReducer(state: AppState, action: Any): TodoState {
                 status = TodoState.Status.PENDING
             )
         }
+        is Action.Todo.RemoveTodo -> {
+            state.todoState.copy(
+                status = TodoState.Status.PENDING
+            )
+        }
+        is Action.Todo.EditTodo -> {
+            state.todoState.copy(
+                status = TodoState.Status.PENDING
+            )
+        }
         else -> state.todoState
     }
 }

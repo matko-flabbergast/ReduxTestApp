@@ -7,6 +7,8 @@ sealed interface Action {
     sealed interface Todo : Action {
         data class AddTodo(val text: String) : Todo
         data class ToggleTodo(val index: Int): Todo
+        data class EditTodo(val index: Int, val text: String): Todo
+        data class RemoveTodo(val index: Int): Todo
         data object FetchTodos: Todo
         data class UpdateTodoList(val items: List<TodoDto>): Todo
         data class Error(val message: String? = ""): Todo

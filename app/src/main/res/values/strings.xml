@@ -10,4 +10,11 @@
     <string name="add_todo">Add New Todo</string>
     <string name="add_todo_placeholder">Todo Text</string>
     <string name="add_todo_dialog_affirmative">Add</string>
+    <string name="edit_todo">Edit Todo</string>
+    <string name="edit_todo_placeholder">Edit todo</string>
+    <string name="edit_todo_dialog_affirmative">Edit</string>
+    <string name="remove_todo_dialog_text">Are you sure you want to delete this todo from your todo list?</string>
+    <string name="remove_todo_dialog_affirmative">Yes</string>
+    <string name="remove_todo_dialog_negative">No</string>
+    <string name="remove_todo">Remove Todo</string>
 </resources>
