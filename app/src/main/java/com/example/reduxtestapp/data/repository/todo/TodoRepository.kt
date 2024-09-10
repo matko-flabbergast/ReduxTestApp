@@ -15,5 +15,13 @@ interface TodoRepository {
         index: Int
     ): List<TodoDto>
 
-    suspend fun longNetworkCall(): String
+    suspend fun editTodo(
+        index: Int,
+        newText: String
+    ): List<TodoDto>
+
+    suspend fun deleteTodo(
+        index: Int
+    ): List<TodoDto>
+
 }
