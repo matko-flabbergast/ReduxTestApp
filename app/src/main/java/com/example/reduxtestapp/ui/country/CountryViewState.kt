@@ -16,12 +16,14 @@ fun AppState.toCountryViewState() = CountryViewState(
 
 data class CountryItem (
     val name: String,
-    val languages: Map<String, String>
+    val languages: Map<String, String>,
+    val currencies: Map<String, String>
 )
 
 fun CountryDto.asPresentation() = CountryItem(
     name = name.common,
-    languages = languages
+    languages = languages,
+    currencies = currencies.mapValues { it.value.name }
 )
 
 fun List<CountryDto>.asPresentation(): List<CountryItem> = map { it.asPresentation() }

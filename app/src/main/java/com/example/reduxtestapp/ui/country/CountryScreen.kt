@@ -1,10 +1,14 @@
 package com.example.reduxtestapp.ui.country
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
@@ -52,11 +56,11 @@ fun CountryScreen(
 
     CountryContent(
         uiState = uiState,
-        onSendSearchQuery = {
-            store.dispatch(Action.Country.SearchCountries(it))
+        onSendSearchQuery = { lang, curr ->
+            store.dispatch(Action.Country.SearchByLanguageAndCurrency(lang, curr))
         },
-        onErrorClick = {
-            store.dispatch(Action.Country.SearchCountries(it))
+        onErrorClick = { lang, curr ->
+            store.dispatch(Action.Country.SearchByLanguageAndCurrency(lang, curr))
         }
     )
 }
@@ -67,25 +71,54 @@ fun CountryScreen(
 private fun CountryContent(
     uiState: CountryViewState,
     modifier: Modifier = Modifier,
-    onSendSearchQuery: (String) -> Unit,
-    onErrorClick: (String) -> Unit,
+    onSendSearchQuery: (String, String) -> Unit,
+    onErrorClick: (String, String) -> Unit,
 ) {
 
     Scaffold (modifier = modifier){ padding ->
         Column (
             modifier = modifier.padding(padding)
         ){
-            var searchQuery by remember {
+            var languageQuery by remember {
                 mutableStateOf("")
             }
-            SearchBar(
-                searchQuery = searchQuery,
-                onSendSearchQuery = onSendSearchQuery,
-                onSearchChanged = {
-                    searchQuery = it
-                },
+
+            var currencyQuery by remember {
+                mutableStateOf("")
+            }
+
+            LaunchedEffect(Unit) {
+                onSendSearchQuery(languageQuery, currencyQuery)
+            }
+
+            LaunchedEffect(languageQuery, currencyQuery) {
+                delay(1000L)
+                onSendSearchQuery(languageQuery, currencyQuery)
+            }
+            Row (
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(16.dp)
-            )
+
+            ){
+                SearchBar(
+                    searchQuery = languageQuery,
+                    onSearchChanged = {
+                        languageQuery = it
+                    },
+                    placeholder = R.string.lang_placeholder,
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(Modifier.width(16.dp))
+                SearchBar(
+                    searchQuery = currencyQuery,
+                    onSearchChanged = {
+                        currencyQuery = it
+                    },
+                    placeholder = R.string.curr_placeholder,
+                    modifier = Modifier.weight(1f)
+                )
+            }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -104,7 +137,7 @@ private fun CountryContent(
                         ErrorButton(
                             modifier = Modifier.fillMaxSize(),
                             onClick = {
-                                onErrorClick(searchQuery)
+                                onErrorClick(languageQuery, currencyQuery)
                             }
                         )
                     }
@@ -151,6 +184,7 @@ private fun CountryItem(
     ){
         Text(countryData.name)
         Text(countryData.languages.toString())
+        Text(countryData.currencies.toString())
     }
 
 }
@@ -181,19 +215,15 @@ private fun ErrorButton(
 private fun SearchBar(
     searchQuery: String,
     onSearchChanged: (String) -> Unit,
-    onSendSearchQuery: (String) -> Unit,
+    @StringRes placeholder: Int,
     modifier: Modifier = Modifier
 ) {
-    LaunchedEffect(key1 = searchQuery) {
-        delay(1000L)
-        onSendSearchQuery(searchQuery)
-    }
 
     TextField(
         value = searchQuery,
         onValueChange = onSearchChanged,
         placeholder = {
-            Text(stringResource(R.string.search_placeholder))
+            Text(stringResource(placeholder))
         },
         leadingIcon = {
             Icon(
@@ -204,7 +234,7 @@ private fun SearchBar(
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Done
         ),
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
     )
 }
 
@@ -216,11 +246,13 @@ private fun CountryPreviewSuccess() {
             countryList = listOf(
                 CountryItem(
                     "Croatia",
-                    hashMapOf("hrv" to "Hrvatski")
+                    hashMapOf("hrv" to "Hrvatski"),
+                    hashMapOf("eur" to "eur")
                 ),
                 CountryItem(
                         "England",
-                hashMapOf("eng" to "English")
+                    hashMapOf("eng" to "English"),
+                    hashMapOf("eur" to "eur")
             )
             ),
             status = CountryState.Status.SUCCESS
@@ -228,8 +260,8 @@ private fun CountryPreviewSuccess() {
         )
         CountryContent(
             uiState = mockUiState,
-            onSendSearchQuery = {},
-            onErrorClick = {}
+            onSendSearchQuery = {_, _ ->},
+            onErrorClick = {_, _ ->}
         )
     }
 }

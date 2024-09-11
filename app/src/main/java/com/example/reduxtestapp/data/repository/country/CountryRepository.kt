@@ -10,4 +10,6 @@ interface CountryRepository {
 
     suspend fun getCountries(query: String): Either<ErrorState, List<CountryDto>>
 
+    suspend fun searchByLanguageAndCurrency(language: String, currency: String): Either<ErrorState, List<CountryDto>>
+
 }

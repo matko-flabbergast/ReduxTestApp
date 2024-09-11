@@ -17,4 +17,6 @@
     <string name="remove_todo_dialog_affirmative">Yes</string>
     <string name="remove_todo_dialog_negative">No</string>
     <string name="remove_todo">Remove Todo</string>
+    <string name="lang_placeholder">Language...</string>
+    <string name="curr_placeholder">Currency...</string>
 </resources>

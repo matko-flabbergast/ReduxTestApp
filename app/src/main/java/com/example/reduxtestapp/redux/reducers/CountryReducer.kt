@@ -28,6 +28,11 @@ fun countryReducer(state: AppState, action: Any): CountryState {
                 status = CountryState.Status.PENDING
             )
         }
+        is Action.Country.SearchByLanguageAndCurrency -> {
+            state.countryState.copy(
+                status = CountryState.Status.PENDING
+            )
+        }
         else -> state.countryState
     }
 }
