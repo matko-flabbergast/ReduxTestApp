@@ -3,6 +3,7 @@ package com.example.reduxtestapp.data.repository.country
 import arrow.core.Either
 import arrow.core.raise.either
 import com.example.reduxtestapp.common.Logger
+import com.example.reduxtestapp.data.cache.CacheManager
 import com.example.reduxtestapp.data.model.country.CountryDto
 import com.example.reduxtestapp.data.network.CountriesApiService
 import com.example.reduxtestapp.data.network.ErrorState
@@ -11,8 +12,11 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
+const val ALL_COUNTRIES_KEY = "all_countries_key"
+
 class CountryRepositoryImpl (
     private val countriesApi: CountriesApiService,
+    private val cacheManager: CacheManager,
     private val logger: Logger
 ): CountryRepository {
 
@@ -45,9 +49,14 @@ class CountryRepositoryImpl (
 
 
 
+    private fun createSearchCountriesCacheKey(query: String) = "search_countries_$query"
+
+
     override suspend fun getAllCountries(): Either<ErrorState, List<CountryDto>> {
         return Either.catch {
-            countriesApi.getAllCountries()
+            cacheManager.useCache(ALL_COUNTRIES_KEY) {
+                countriesApi.getAllCountries()
+            }
         }.mapLeft { throwable ->
             ErrorState.CountriesError(throwable.message).also {
                 logError(throwable.message)
@@ -58,9 +67,13 @@ class CountryRepositoryImpl (
     override suspend fun getCountries(query: String): Either<ErrorState, List<CountryDto>> {
         return Either.catch {
             if (query.isNotEmpty()) {
-                countriesApi.searchCountries(query)
+                cacheManager.useCache(createSearchCountriesCacheKey(query)) {
+                    countriesApi.searchCountries(query)
+                }
             } else {
-                countriesApi.getAllCountries()
+                cacheManager.useCache(ALL_COUNTRIES_KEY) {
+                    countriesApi.getAllCountries()
+                }
             }
         }.mapLeft { throwable ->
             handleError(throwable)

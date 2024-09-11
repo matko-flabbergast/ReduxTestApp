@@ -54,6 +54,10 @@ fun CountryScreen(
 
     val uiState = store.collectState(AppState::toCountryViewState)
 
+    LaunchedEffect(Unit) {
+        store.dispatch(Action.Country.LoadInitialCountries)
+    }
+
     CountryContent(
         uiState = uiState,
         onSendSearchQuery = { lang, curr ->
@@ -87,13 +91,11 @@ private fun CountryContent(
                 mutableStateOf("")
             }
 
-            LaunchedEffect(Unit) {
-                onSendSearchQuery(languageQuery, currencyQuery)
-            }
-
             LaunchedEffect(languageQuery, currencyQuery) {
-                delay(1000L)
-                onSendSearchQuery(languageQuery, currencyQuery)
+                if (languageQuery.isNotEmpty() && currencyQuery.isNotEmpty()){
+                    delay(1000L)
+                    onSendSearchQuery(languageQuery, currencyQuery)
+                }
             }
             Row (
                 horizontalArrangement = Arrangement.Center,
