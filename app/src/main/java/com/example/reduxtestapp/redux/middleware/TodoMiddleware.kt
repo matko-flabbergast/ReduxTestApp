@@ -1,7 +1,7 @@
 package com.example.reduxtestapp.redux.middleware
 
-import com.example.reduxtestapp.data.model.todo.TodoDto
 import com.example.reduxtestapp.data.repository.todo.TodoRepository
+import com.example.reduxtestapp.domain.model.todo.TodoModel
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.redux.Middleware
@@ -11,7 +11,7 @@ class TodoMiddleware (
     private val repo: TodoRepository,
 ) : Middleware() {
 
-    private fun launchAsyncAndDispatchUpdate(store: Store<AppState>, newListGetter: suspend () -> List<TodoDto>) {
+    private fun launchAsyncAndDispatchUpdate(store: Store<AppState>, newListGetter: suspend () -> List<TodoModel>) {
         store.dispatch(Action.Async{
             val newList = newListGetter()
             store.dispatch(Action.Todo.UpdateTodoList(newList))
@@ -23,7 +23,7 @@ class TodoMiddleware (
             is Action.Todo.AddTodo -> {
                 launchAsyncAndDispatchUpdate(store){
                     repo.insertTodo(
-                        TodoDto(action.text, false)
+                        TodoModel(action.text, false)
                     )
                 }
             }

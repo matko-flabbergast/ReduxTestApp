@@ -2,14 +2,18 @@ package com.example.reduxtestapp.redux.middleware
 
 import com.example.reduxtestapp.common.Logger
 import com.example.reduxtestapp.data.network.ErrorState
-import com.example.reduxtestapp.data.repository.country.CountryRepository
+import com.example.reduxtestapp.domain.use_cases.GetCountriesUseCase
+import com.example.reduxtestapp.domain.use_cases.SearchCountriesUseCase
+import com.example.reduxtestapp.domain.use_cases.SearchLanguageAndCurrencyUseCase
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.redux.Middleware
 import org.reduxkotlin.Store
 
 class CountryMiddleware (
-    private val repo: CountryRepository,
+    private val getCountriesUseCase: GetCountriesUseCase,
+    private val searchCountriesUseCase: SearchCountriesUseCase,
+    private val searchLanguageAndCurrencyUseCase: SearchLanguageAndCurrencyUseCase,
     private val logger: Logger
 ) : Middleware() {
 
@@ -38,7 +42,7 @@ class CountryMiddleware (
         when (action) {
             is Action.Country.GetCountries -> {
                 store.dispatch(Action.Async{
-                    val networkResult = repo.getAllCountries()
+                    val networkResult = getCountriesUseCase()
                     networkResult
                         .onRight { countryList ->
                             store.dispatch(Action.Country.UpdateCountryList(countryList))
@@ -58,7 +62,7 @@ class CountryMiddleware (
             }
             is Action.Country.SearchCountries -> {
                 store.dispatch(Action.Async{
-                    val networkResult = repo.getCountries(action.query)
+                    val networkResult = searchCountriesUseCase(action.query)
                     networkResult
                         .onRight { countryList ->
                             store.dispatch(Action.Country.UpdateCountryList(countryList))
@@ -70,7 +74,7 @@ class CountryMiddleware (
             }
             is Action.Country.SearchByLanguageAndCurrency -> {
                 store.dispatch(Action.Async{
-                    val networkResult = repo.searchByLanguageAndCurrency(action.language, action.currency)
+                    val networkResult = searchLanguageAndCurrencyUseCase(action.language, action.currency)
                     networkResult
                         .onRight { countryList ->
                             store.dispatch(Action.Country.UpdateCountryList(countryList))

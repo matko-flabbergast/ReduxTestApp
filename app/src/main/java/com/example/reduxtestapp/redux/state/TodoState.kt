@@ -1,9 +1,9 @@
 package com.example.reduxtestapp.redux.state
 
-import com.example.reduxtestapp.data.model.todo.TodoDto
+import com.example.reduxtestapp.domain.model.todo.TodoModel
 
 data class TodoState (
-    val todoList: List<TodoDto> = listOf(),
+    val todoList: List<TodoModel> = listOf(),
     val status: Status = Status.PENDING,
 ) {
     enum class Status { SUCCESS, PENDING, ERROR }

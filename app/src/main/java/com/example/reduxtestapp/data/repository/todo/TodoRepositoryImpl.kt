@@ -7,6 +7,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.reduxtestapp.data.model.todo.TodoDto
+import com.example.reduxtestapp.data.model.todo.asData
+import com.example.reduxtestapp.data.model.todo.asDomain
+import com.example.reduxtestapp.domain.model.todo.TodoModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.encodeToString
@@ -39,38 +42,38 @@ data class TodoRepositoryImpl (
             Json.decodeFromString<List<TodoDto>>(
                 preferences[TODO_PREFERENCES_KEY] ?: "[]"
             )
-        }.first()
+        }.first().asDomain()
 
-    override suspend fun insertTodo(todoDto: TodoDto): List<TodoDto> {
+    override suspend fun insertTodo(todoModel: TodoModel): List<TodoModel> {
         return makeChanges { oldList ->
-            oldList.add(todoDto)
+            oldList.add(todoModel.asData())
             oldList
-        }
+        }.asDomain()
     }
 
-    override suspend fun toggleTodo(index: Int): List<TodoDto> {
+    override suspend fun toggleTodo(index: Int): List<TodoModel> {
         return makeChanges { oldList ->
             oldList[index] = oldList[index].copy(
                 isCompleted = !oldList[index].isCompleted
             )
             oldList
-        }
+        }.asDomain()
     }
 
-    override suspend fun editTodo(index: Int, newText: String): List<TodoDto> {
+    override suspend fun editTodo(index: Int, newText: String): List<TodoModel> {
         return makeChanges { oldList ->
             oldList[index] = oldList[index].copy(
                 text = newText
             )
             oldList
-        }
+        }.asDomain()
     }
 
-    override suspend fun deleteTodo(index: Int): List<TodoDto> {
+    override suspend fun deleteTodo(index: Int): List<TodoModel> {
         return makeChanges { oldList ->
             oldList.removeAt(index)
             oldList
-        }
+        }.asDomain()
     }
 
 
