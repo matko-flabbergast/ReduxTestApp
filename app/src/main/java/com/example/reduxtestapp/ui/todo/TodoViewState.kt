@@ -1,6 +1,6 @@
 package com.example.reduxtestapp.ui.todo
 
-import com.example.reduxtestapp.data.model.todo.TodoDto
+import com.example.reduxtestapp.domain.model.todo.TodoModel
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.redux.state.TodoState
 
@@ -19,9 +19,9 @@ data class TodoItem (
     val isCompleted: Boolean
 )
 
-fun TodoDto.asPresentation() = TodoItem(
+fun TodoModel.asPresentation() = TodoItem(
     text = text,
     isCompleted = isCompleted
 )
 
-fun List<TodoDto>.asPresentation(): List<TodoItem> = map { it.asPresentation() }
+fun List<TodoModel>.asPresentation(): List<TodoItem> = map { it.asPresentation() }

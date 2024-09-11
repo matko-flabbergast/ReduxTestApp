@@ -1,6 +1,6 @@
 package com.example.reduxtestapp.ui.country
 
-import com.example.reduxtestapp.data.model.country.CountryDto
+import com.example.reduxtestapp.domain.model.country.CountryModel
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.redux.state.CountryState
 
@@ -20,10 +20,10 @@ data class CountryItem (
     val currencies: Map<String, String>
 )
 
-fun CountryDto.asPresentation() = CountryItem(
+fun CountryModel.asPresentation() = CountryItem(
     name = name.common,
     languages = languages,
     currencies = currencies.mapValues { it.value.name }
 )
 
-fun List<CountryDto>.asPresentation(): List<CountryItem> = map { it.asPresentation() }
+fun List<CountryModel>.asPresentation(): List<CountryItem> = map { it.asPresentation() }

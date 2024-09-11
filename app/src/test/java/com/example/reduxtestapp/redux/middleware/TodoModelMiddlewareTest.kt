@@ -1,8 +1,8 @@
 package com.example.reduxtestapp.redux.middleware
 
-import com.example.reduxtestapp.data.model.todo.TodoDto
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.data.repository.todo.TodoRepository
+import com.example.reduxtestapp.domain.model.todo.TodoModel
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.redux.rootReducer
 import io.mockk.coEvery
@@ -16,7 +16,7 @@ import org.reduxkotlin.Store
 import org.reduxkotlin.applyMiddleware
 import org.reduxkotlin.createThreadSafeStore
 
-class TodoMiddlewareTest {
+class TodoModelMiddlewareTest {
     private val repo = mockk<TodoRepository>()
     private val testDispatcher = StandardTestDispatcher()
 
@@ -128,9 +128,9 @@ class TodoMiddlewareTest {
     fun `addTodo action updates state with added todo`() = runTest {
         val store = createStore()
         val testText = "Test Todo"
-        val testTodo = TodoDto(testText, false)
+        val testTodo = TodoModel(testText, false)
         coEvery { repo.insertTodo(any()) } returns listOf(
-            TodoDto(testText, false)
+            TodoModel(testText, false)
         )
         store.dispatch(Action.Todo.AddTodo(testText))
         advanceUntilIdle()
@@ -146,7 +146,7 @@ class TodoMiddlewareTest {
     fun `toggleTodo action updates state with toggled todo`() = runTest {
         val store = createStore()
         val index = 0
-        val testTodo = TodoDto("Test Todo", false)
+        val testTodo = TodoModel("Test Todo", false)
         coEvery { repo.toggleTodo(any()) } returns listOf(
             testTodo
         )

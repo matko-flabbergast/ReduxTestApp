@@ -3,10 +3,12 @@ package com.example.reduxtestapp.data.repository.country
 import arrow.core.Either
 import arrow.core.raise.either
 import com.example.reduxtestapp.common.Logger
+import com.example.reduxtestapp.data.model.country.asDomain
 import com.example.reduxtestapp.data.cache.CacheManager
 import com.example.reduxtestapp.data.model.country.CountryDto
 import com.example.reduxtestapp.data.network.CountriesApiService
 import com.example.reduxtestapp.data.network.ErrorState
+import com.example.reduxtestapp.domain.model.country.CountryModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
@@ -50,12 +52,13 @@ class CountryRepositoryImpl (
 
 
     private fun createSearchCountriesCacheKey(query: String) = "search_countries_$query"
+    
+    private fun createLanguageAndCurrencyCacheKey(lang: String, curr: String) = "lang_and_curr_${lang}_$curr"
 
-
-    override suspend fun getAllCountries(): Either<ErrorState, List<CountryDto>> {
+    override suspend fun getAllCountries(): Either<ErrorState, List<CountryModel>> {
         return Either.catch {
             cacheManager.useCache(ALL_COUNTRIES_KEY) {
-                countriesApi.getAllCountries()
+                countriesApi.getAllCountries().asDomain()
             }
         }.mapLeft { throwable ->
             ErrorState.CountriesError(throwable.message).also {
@@ -64,16 +67,16 @@ class CountryRepositoryImpl (
         }
     }
 
-    override suspend fun getCountries(query: String): Either<ErrorState, List<CountryDto>> {
+    override suspend fun getCountries(query: String): Either<ErrorState, List<CountryModel>> {
         return Either.catch {
             if (query.isNotEmpty()) {
                 cacheManager.useCache(createSearchCountriesCacheKey(query)) {
                     countriesApi.searchCountries(query)
-                }
+                }.asDomain()
             } else {
                 cacheManager.useCache(ALL_COUNTRIES_KEY) {
                     countriesApi.getAllCountries()
-                }
+                }.asDomain()
             }
         }.mapLeft { throwable ->
             handleError(throwable)
@@ -83,22 +86,22 @@ class CountryRepositoryImpl (
     override suspend fun searchByLanguageAndCurrency(
         language: String,
         currency: String
-    ): Either<ErrorState, List<CountryDto>> {
+    ): Either<ErrorState, List<CountryModel>> {
         return either {
 
             withContext(Dispatchers.IO){
+                cacheManager.useCache(createLanguageAndCurrencyCacheKey(language, currency)) {
+                    val deferredLanguageResult = async {
+                        searchByLanguage(language)
+                    }
+                    val deferredCurrencyResult = async {
+                        searchByCurrency(currency)
+                    }
 
-                val deferredLanguageResult = async {
-                    searchByLanguage(language)
+                    val languageResult = deferredLanguageResult.await().bind()
+                    val currencyResult = deferredCurrencyResult.await().bind()
+                    languageResult.intersect(currencyResult.toSet()).toList().asDomain()
                 }
-                val deferredCurrencyResult = async {
-                    searchByCurrency(currency)
-                }
-
-                val languageResult = deferredLanguageResult.await().bind()
-                val currencyResult = deferredCurrencyResult.await().bind()
-                languageResult.intersect(currencyResult.toSet()).toList()
-
             }
 
         }

@@ -1,27 +1,27 @@
 package com.example.reduxtestapp.data.repository.todo
 
-import com.example.reduxtestapp.data.model.todo.TodoDto
+import com.example.reduxtestapp.domain.model.todo.TodoModel
 
 interface TodoRepository {
 
     suspend fun getTodos(
-    ): List<TodoDto>
+    ): List<TodoModel>
 
     suspend fun insertTodo(
-        todoDto: TodoDto
-    ): List<TodoDto>
+        todoModel: TodoModel
+    ): List<TodoModel>
 
     suspend fun toggleTodo(
         index: Int
-    ): List<TodoDto>
+    ): List<TodoModel>
 
     suspend fun editTodo(
         index: Int,
         newText: String
-    ): List<TodoDto>
+    ): List<TodoModel>
 
     suspend fun deleteTodo(
         index: Int
-    ): List<TodoDto>
+    ): List<TodoModel>
 
 }
