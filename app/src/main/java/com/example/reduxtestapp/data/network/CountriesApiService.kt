@@ -13,4 +13,10 @@ interface CountriesApiService {
 
     @GET("name/{query}")
     suspend fun searchCountries(@Path("query") query: String) : List<CountryDto>
+
+    @GET("currency/{currency}")
+    suspend fun getByCurrency(@Path("currency") currency: String): List<CountryDto>
+
+    @GET("lang/{language}")
+    suspend fun getByLanguage(@Path("language") language: String): List<CountryDto>
 }

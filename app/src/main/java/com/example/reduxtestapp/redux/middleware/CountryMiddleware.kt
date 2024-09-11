@@ -21,6 +21,18 @@ class CountryMiddleware (
         )
     }
 
+    private fun handleError(error: ErrorState, store: Store<AppState>) {
+        when (error) {
+            is ErrorState.EmptyListError -> {
+                store.dispatch(Action.Country.UpdateCountryList(listOf()))
+            }
+            else -> {
+                logError("countryMiddleware: error occurred $error")
+                store.dispatch(Action.Country.Error())
+            }
+        }
+    }
+
     override fun middleware(store: Store<AppState>, action: Any) {
 
         when (action) {
@@ -52,15 +64,19 @@ class CountryMiddleware (
                             store.dispatch(Action.Country.UpdateCountryList(countryList))
                         }
                         .onLeft { error ->
-                            when (error) {
-                                is ErrorState.EmptyListError -> {
-                                    store.dispatch(Action.Country.UpdateCountryList(listOf()))
-                                }
-                                else -> {
-                                    logError("countryMiddleware: error occurred error")
-                                    store.dispatch(Action.Country.Error())
-                                }
-                            }
+                            handleError(error, store)
+                        }
+                })
+            }
+            is Action.Country.SearchByLanguageAndCurrency -> {
+                store.dispatch(Action.Async{
+                    val networkResult = repo.searchByLanguageAndCurrency(action.language, action.currency)
+                    networkResult
+                        .onRight { countryList ->
+                            store.dispatch(Action.Country.UpdateCountryList(countryList))
+                        }
+                        .onLeft { error ->
+                            handleError(error, store)
                         }
                 })
             }
