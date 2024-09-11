@@ -80,6 +80,9 @@ class CountryMiddleware (
                         }
                 })
             }
+            is Action.Country.LoadInitialCountries -> {
+                store.dispatch(Action.Country.SearchByLanguageAndCurrency("",""))
+            }
         }
 
     }

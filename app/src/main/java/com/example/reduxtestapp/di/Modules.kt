@@ -2,6 +2,8 @@ package com.example.reduxtestapp.di
 
 import com.example.reduxtestapp.common.DefaultLogger
 import com.example.reduxtestapp.common.Logger
+import com.example.reduxtestapp.data.cache.CacheManager
+import com.example.reduxtestapp.data.cache.CacheManagerImpl
 import com.example.reduxtestapp.data.network.BASE_URL
 import com.example.reduxtestapp.data.network.CountriesApiService
 import com.example.reduxtestapp.data.repository.country.CountryRepository
@@ -27,7 +29,7 @@ val sharedModule = module {
     }
 
     single<CountryRepository>{
-        CountryRepositoryImpl(get(), get())
+        CountryRepositoryImpl(get(), get(), get())
     }
 
     single<Store<AppState>>{
@@ -74,5 +76,9 @@ val sharedModule = module {
 
     single<Logger> {
         DefaultLogger
+    }
+
+    single<CacheManager>{
+        CacheManagerImpl()
     }
 }

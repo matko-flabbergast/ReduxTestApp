@@ -16,6 +16,7 @@ sealed interface Action {
     sealed interface Country : Action {
         data object GetCountries: Country
         data class SearchCountries(val query: String): Country
+        data object LoadInitialCountries : Country
         data class UpdateCountryList(val items: List<CountryDto>): Country
         data class SearchByLanguageAndCurrency(val language: String, val currency: String): Country
         data class Error(val message: String? = ""): Country
