@@ -9,8 +9,8 @@ abstract class Middleware {
 
     fun launchMiddleware(store: Store<AppState>) = { next: Dispatcher ->
         { action: Any ->
-            middleware(store, action)
             val result = next(action)
+            middleware(store, action)
             result
         }
     }

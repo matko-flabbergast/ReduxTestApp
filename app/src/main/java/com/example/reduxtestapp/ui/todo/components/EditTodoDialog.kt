@@ -1,9 +1,14 @@
-package com.example.reduxtestapp.ui.todo
+package com.example.reduxtestapp.ui.todo.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.example.reduxtestapp.R
@@ -19,38 +24,40 @@ import org.reduxkotlin.Store
 @RootNavGraph
 @Destination(style = DestinationStyle.Dialog::class)
 @Composable
-fun RemoveTodoDialog(
+fun EditTodoDialog(
     index: Int,
+    todoText: String,
     navigator: DestinationsNavigator,
     modifier: Modifier = Modifier,
     store: Store<AppState> = koinInject(),
 ) {
+
+    var text by remember {
+        mutableStateOf(todoText)
+    }
     AlertDialog(
         onDismissRequest = { navigator.popBackStack() },
-        title = { Text(stringResource(R.string.remove_todo)) },
+        title = { Text(stringResource(R.string.edit_todo)) },
         text = {
-            Text(stringResource(R.string.remove_todo_dialog_text))
+            TextField(
+                value = text,
+                onValueChange = { text = it },
+                placeholder = {
+                    Text(stringResource(R.string.edit_todo_placeholder))
+                }
+            )
         },
         modifier = modifier,
         confirmButton = {
             TextButton(
                 onClick = {
-                    store.dispatch(Action.Todo.RemoveTodo(index))
+                    store.dispatch(Action.Todo.EditTodo(index, text))
                     navigator.popBackStack()
                 }
             ) {
-                Text(stringResource(R.string.remove_todo_dialog_affirmative))
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = {
-                    navigator.popBackStack()
-                }
-            ) {
-                Text(stringResource(R.string.remove_todo_dialog_negative))
+                Text(stringResource(R.string.edit_todo_dialog_affirmative))
             }
         }
-
     )
+
 }

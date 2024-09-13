@@ -35,6 +35,7 @@ import com.example.reduxtestapp.redux.state.TodoState
 import com.example.reduxtestapp.ui.destinations.AddTodoDialogDestination
 import com.example.reduxtestapp.ui.destinations.EditTodoDialogDestination
 import com.example.reduxtestapp.ui.destinations.RemoveTodoDialogDestination
+import com.example.reduxtestapp.ui.todo.transitions.TodoTransitions
 import com.example.reduxtestapp.util.collectState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
@@ -43,7 +44,7 @@ import org.koin.compose.koinInject
 import org.reduxkotlin.Store
 
 @RootNavGraph
-@Destination
+@Destination(style = TodoTransitions::class)
 @Composable
 fun TodoScreen(
     navigator: DestinationsNavigator,

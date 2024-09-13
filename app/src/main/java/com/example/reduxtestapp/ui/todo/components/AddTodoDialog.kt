@@ -1,4 +1,4 @@
-package com.example.reduxtestapp.ui.todo
+package com.example.reduxtestapp.ui.todo.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
@@ -24,26 +24,23 @@ import org.reduxkotlin.Store
 @RootNavGraph
 @Destination(style = DestinationStyle.Dialog::class)
 @Composable
-fun EditTodoDialog(
-    index: Int,
-    todoText: String,
+fun AddTodoDialog(
     navigator: DestinationsNavigator,
     modifier: Modifier = Modifier,
     store: Store<AppState> = koinInject(),
 ) {
-
     var text by remember {
-        mutableStateOf(todoText)
+        mutableStateOf("")
     }
     AlertDialog(
         onDismissRequest = { navigator.popBackStack() },
-        title = { Text(stringResource(R.string.edit_todo)) },
+        title = { Text(stringResource(R.string.add_todo)) },
         text = {
             TextField(
                 value = text,
                 onValueChange = { text = it },
                 placeholder = {
-                    Text(stringResource(R.string.edit_todo_placeholder))
+                    Text(stringResource(R.string.add_todo_placeholder))
                 }
             )
         },
@@ -51,13 +48,12 @@ fun EditTodoDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    store.dispatch(Action.Todo.EditTodo(index, text))
+                    store.dispatch(Action.Todo.AddTodo(text))
                     navigator.popBackStack()
                 }
             ) {
-                Text(stringResource(R.string.edit_todo_dialog_affirmative))
+                Text(stringResource(R.string.add_todo_dialog_affirmative))
             }
         }
     )
-
 }

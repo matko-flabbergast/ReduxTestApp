@@ -8,4 +8,5 @@ val dataModule = module {
     single<CacheManager> {
         CacheManagerImpl()
     }
+    includes(countryDataModule, todoDataModule, priceDataModule)
 }

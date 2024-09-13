@@ -83,7 +83,11 @@ private fun MyBottomNav(
                 selected = currentDestination == destination.direction,
                 onClick = {
                     destinationsNavigator.navigate(destination.direction) {
+                        popUpTo(destinationsNavigator.graph.startDestinationId) {
+                            saveState = true
+                        }
                         launchSingleTop = true
+                        restoreState = true
                     }
                 },
                 icon = {

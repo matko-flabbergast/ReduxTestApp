@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,36 +36,32 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.reduxtestapp.R
 import com.example.reduxtestapp.redux.Action
-import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.redux.state.CountryState
+import com.example.reduxtestapp.ui.home.transitions.HomeTransitions
 import com.example.reduxtestapp.ui.theme.ReduxTestAppTheme
-import com.example.reduxtestapp.util.collectState
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import kotlinx.coroutines.delay
-import org.koin.compose.koinInject
-import org.reduxkotlin.Store
+import org.koin.androidx.compose.koinViewModel
 
 @RootNavGraph
-@Destination
+@Destination(style = HomeTransitions::class)
 @Composable
 fun CountryScreen(
-    store: Store<AppState> = koinInject(),
+    viewModel: CountryViewModel = koinViewModel(),
 ) {
-
-    val uiState = store.collectState(AppState::toCountryViewState)
-
+    val uiState by viewModel.uiState.collectAsState()
     LaunchedEffect(Unit) {
-        store.dispatch(Action.Country.LoadInitialCountries)
+        viewModel.dispatch(Action.Country.LoadInitialCountries)
     }
 
     CountryContent(
         uiState = uiState,
         onSendSearchQuery = { lang, curr ->
-            store.dispatch(Action.Country.SearchByLanguageAndCurrency(lang, curr))
+            viewModel.dispatch(Action.Country.SearchByLanguageAndCurrency(lang, curr))
         },
         onErrorClick = { lang, curr ->
-            store.dispatch(Action.Country.SearchByLanguageAndCurrency(lang, curr))
+            viewModel.dispatch(Action.Country.SearchByLanguageAndCurrency(lang, curr))
         }
     )
 }

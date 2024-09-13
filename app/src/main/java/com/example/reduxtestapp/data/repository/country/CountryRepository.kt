@@ -12,6 +12,5 @@ interface CountryRepository {
 
     suspend fun searchByLanguageAndCurrency(language: String, currency: String): Either<ErrorState, List<CountryModel>>
 
-    suspend fun searchByLanguageAndCurrency(language: String, currency: String): Either<ErrorState, List<CountryDto>>
 
 }
