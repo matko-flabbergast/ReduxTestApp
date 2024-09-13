@@ -38,7 +38,6 @@ class CountryMiddleware (
     }
 
     override fun middleware(store: Store<AppState>, action: Any) {
-
         when (action) {
             is Action.Country.GetCountries -> {
                 store.dispatch(Action.Async{
@@ -48,15 +47,7 @@ class CountryMiddleware (
                             store.dispatch(Action.Country.UpdateCountryList(countryList))
                         }
                         .onLeft { error ->
-                            when (error) {
-                                is ErrorState.EmptyListError -> {
-                                    store.dispatch(Action.Country.UpdateCountryList(listOf()))
-                                }
-                                else -> {
-                                    logError("countryMiddleware: error occurred $error")
-                                    store.dispatch(Action.Country.Error())
-                                }
-                            }
+                            handleError(error, store)
                         }
                 })
             }
