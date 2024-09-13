@@ -1,7 +1,9 @@
 package com.example.reduxtestapp.redux
 
 import com.example.reduxtestapp.domain.model.country.CountryModel
+import com.example.reduxtestapp.domain.model.price.PriceModel
 import com.example.reduxtestapp.domain.model.todo.TodoModel
+import kotlinx.coroutines.flow.Flow
 
 sealed interface Action {
     sealed interface Todo : Action {
@@ -20,7 +22,16 @@ sealed interface Action {
         data class UpdateCountryList(val items: List<CountryModel>): Country
         data class SearchByLanguageAndCurrency(val language: String, val currency: String): Country
         data class Error(val message: String? = ""): Country
-
     }
+
+    sealed interface Home: Action {
+        data object GetPrice: Home
+        data class UpdatePrice(val priceModel: PriceModel): Home
+        data object PollPrice: Home
+        data object StopPollingPrice: Home
+    }
+
+    data class Stream(val key: String, val actionFlow: Flow<Any>): Action
+    data class StopStream(val key: String): Action
     data class Async(val asyncFunc: suspend () -> Unit): Action
 }

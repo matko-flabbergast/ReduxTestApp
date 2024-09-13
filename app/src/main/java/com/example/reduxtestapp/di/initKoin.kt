@@ -16,7 +16,7 @@ fun initKoin(config: KoinAppDeclaration? = null) {
             dataModule,
             reduxModule,
             domainModule,
-            uiModule
+            uiModule,
         )
     }
 }
