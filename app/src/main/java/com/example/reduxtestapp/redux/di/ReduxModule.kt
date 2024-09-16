@@ -1,12 +1,10 @@
 package com.example.reduxtestapp.redux.di
 
-import com.example.reduxtestapp.common.di.BACKGROUND_DISPATCHER
 import com.example.reduxtestapp.common.di.IO_DISPATCHER
 import com.example.reduxtestapp.redux.AppState
-import com.example.reduxtestapp.redux.middleware.AsyncMiddleware
 import com.example.reduxtestapp.redux.middleware.CountryMiddleware
 import com.example.reduxtestapp.redux.middleware.PriceMiddleware
-import com.example.reduxtestapp.redux.middleware.StreamMiddleware
+import com.example.reduxtestapp.redux.middleware.RootMiddleware
 import com.example.reduxtestapp.redux.middleware.TodoMiddleware
 import com.example.reduxtestapp.redux.rootReducer
 import org.koin.core.qualifier.named
@@ -23,13 +21,17 @@ val reduxModule = module {
             },
             preloadedState = AppState(),
             enhancer = applyMiddleware(
-                get<TodoMiddleware>()::launchMiddleware,
-                get<CountryMiddleware>()::launchMiddleware,
-                get<PriceMiddleware>()::launchMiddleware,
-                get<AsyncMiddleware>()::launchMiddleware,
-                get<StreamMiddleware>()::launchMiddleware,
+                get<RootMiddleware>()::launchMiddleware
             )
         )
+    }
+
+    single<RootMiddleware> {
+        RootMiddleware(get(named(IO_DISPATCHER)), listOf(
+            get<TodoMiddleware>(),
+            get<CountryMiddleware>(),
+            get<PriceMiddleware>()
+        ))
     }
 
     single<TodoMiddleware> {
@@ -53,15 +55,4 @@ val reduxModule = module {
         )
     }
 
-    single<AsyncMiddleware>{
-        AsyncMiddleware(
-            get(named(IO_DISPATCHER))
-        )
-    }
-
-    single<StreamMiddleware>{
-        StreamMiddleware(
-            get(named(BACKGROUND_DISPATCHER))
-        )
-    }
 }
