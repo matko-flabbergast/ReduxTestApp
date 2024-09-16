@@ -37,15 +37,15 @@ import androidx.compose.ui.unit.dp
 import com.example.reduxtestapp.R
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.state.CountryState
-import com.example.reduxtestapp.ui.home.transitions.HomeTransitions
 import com.example.reduxtestapp.ui.theme.ReduxTestAppTheme
+import com.example.reduxtestapp.ui.todo.transitions.TodoTransitions
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @RootNavGraph
-@Destination(style = HomeTransitions::class)
+@Destination(style = TodoTransitions::class)
 @Composable
 fun CountryScreen(
     viewModel: CountryViewModel = koinViewModel(),

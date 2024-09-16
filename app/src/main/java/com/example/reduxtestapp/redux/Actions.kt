@@ -3,7 +3,6 @@ package com.example.reduxtestapp.redux
 import com.example.reduxtestapp.domain.model.country.CountryModel
 import com.example.reduxtestapp.domain.model.price.PriceModel
 import com.example.reduxtestapp.domain.model.todo.TodoModel
-import kotlinx.coroutines.flow.Flow
 
 sealed interface Action {
     sealed interface Todo : Action {
@@ -31,7 +30,4 @@ sealed interface Action {
         data object StopPollingPrice: Home
     }
 
-    data class Stream(val key: String, val actionFlow: Flow<Any>): Action
-    data class StopStream(val key: String): Action
-    data class Async(val asyncFunc: suspend () -> Unit): Action
 }

@@ -5,48 +5,59 @@ import com.example.reduxtestapp.domain.model.todo.TodoModel
 import com.example.reduxtestapp.redux.Action
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.redux.Middleware
-import org.reduxkotlin.Store
+import com.example.reduxtestapp.redux.MiddlewareResult
 
 class TodoMiddleware (
     private val repo: TodoRepository,
 ) : Middleware() {
 
-    private fun launchAsyncAndDispatchUpdate(store: Store<AppState>, newListGetter: suspend () -> List<TodoModel>) {
-        store.dispatch(Action.Async{
-            val newList = newListGetter()
-            store.dispatch(Action.Todo.UpdateTodoList(newList))
-        })
+    override fun handleAction(state: AppState, action: Any): MiddlewareResult {
+        return when (action) {
+            is Action.Todo.AddTodo -> handleAddTodo(action.text)
+            is Action.Todo.ToggleTodo -> handleToggleTodo(action.index)
+            is Action.Todo.FetchTodos -> handleFetchTodos()
+            is Action.Todo.EditTodo -> handleEditTodo(action.index, action.text)
+            is Action.Todo.RemoveTodo -> handleRemoveTodo(action.index)
+            else -> MiddlewareResult.Nothing
+        }
     }
 
-    override fun middleware(store: Store<AppState>, action: Any) {
-        when (action) {
-            is Action.Todo.AddTodo -> {
-                launchAsyncAndDispatchUpdate(store){
-                    repo.insertTodo(
-                        TodoModel(action.text, false)
-                    )
-                }
-            }
-            is Action.Todo.ToggleTodo -> {
-                launchAsyncAndDispatchUpdate(store){
-                    repo.toggleTodo(action.index)
-                }
-            }
-            is Action.Todo.FetchTodos -> {
-                launchAsyncAndDispatchUpdate(store){
-                    repo.getTodos()
-                }
-            }
-            is Action.Todo.EditTodo -> {
-                launchAsyncAndDispatchUpdate(store){
-                    repo.editTodo(action.index, action.text)
-                }
-            }
-            is Action.Todo.RemoveTodo -> {
-                launchAsyncAndDispatchUpdate(store){
-                    repo.deleteTodo(action.index)
-                }
-            }
+    private fun launchAsync(newListGetter: suspend () -> List<TodoModel>): MiddlewareResult {
+        return MiddlewareResult.Async{
+            val newList = newListGetter()
+            MiddlewareResult.ResultAction(Action.Todo.UpdateTodoList(newList))
+        }
+    }
+
+    private fun handleAddTodo(text: String): MiddlewareResult {
+        return launchAsync{
+            repo.insertTodo(
+                TodoModel(text, false)
+            )
+        }
+    }
+
+    private fun handleToggleTodo(index: Int): MiddlewareResult {
+        return launchAsync{
+            repo.toggleTodo(index)
+        }
+    }
+
+    private fun handleFetchTodos(): MiddlewareResult {
+        return launchAsync{
+            repo.getTodos()
+        }
+    }
+
+    private fun handleEditTodo(index: Int, text: String): MiddlewareResult {
+        return launchAsync{
+            repo.editTodo(index, text)
+        }
+    }
+
+    private fun handleRemoveTodo(index: Int): MiddlewareResult {
+        return launchAsync{
+            repo.deleteTodo(index)
         }
     }
 
