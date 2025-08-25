@@ -12,9 +12,9 @@ import org.reduxkotlin.Store
 class TodoPollingService(
     private val todoRepository: TodoRepository,
     private val store: Store<*>,
-    scope: CoroutineScope
+    scope: CoroutineScope? = null
 ) {
-    private val poller = Poller(scope)
+    private val poller = scope?.let { Poller(it) } ?: PollerFactory.createIOPoller()
     
     /**
      * Starts polling for todo updates with increasing intervals.
@@ -61,9 +61,9 @@ class TodoPollingService(
  */
 class NetworkPollingService(
     private val todoRepository: TodoRepository,
-    scope: CoroutineScope
+    scope: CoroutineScope? = null
 ) {
-    private val poller = Poller(scope)
+    private val poller = scope?.let { Poller(it) } ?: PollerFactory.createIOPoller()
     
     /**
      * Starts polling a long network call with increasing intervals.
