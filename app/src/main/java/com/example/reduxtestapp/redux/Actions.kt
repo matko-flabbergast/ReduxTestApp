@@ -1,7 +1,7 @@
 package com.example.reduxtestapp.redux
 
 import android.content.Context
-import com.example.reduxtestapp.data.model.todo.TodoItem
+import com.example.reduxtestapp.data.model.TodoItem
 
 sealed interface Action {
     sealed interface Todo {
