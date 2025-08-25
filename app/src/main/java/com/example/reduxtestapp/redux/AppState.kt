@@ -1,6 +1,6 @@
 package com.example.reduxtestapp.redux
 
-import com.example.reduxtestapp.data.model.todo.TodoItem
+import com.example.reduxtestapp.data.model.TodoItem
 
 data class AppState (
     val todoList: List<TodoItem> = listOf(),

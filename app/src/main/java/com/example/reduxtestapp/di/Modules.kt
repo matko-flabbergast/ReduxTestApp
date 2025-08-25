@@ -4,8 +4,8 @@ import com.example.reduxtestapp.data.network.BASE_URL
 import com.example.reduxtestapp.data.network.CountriesApiService
 import com.example.reduxtestapp.redux.AppState
 import com.example.reduxtestapp.redux.middleware.RepoMiddleware
-import com.example.reduxtestapp.data.repository.todo.TodoRepository
-import com.example.reduxtestapp.data.repository.todo.TodoRepositoryImplementation
+import com.example.reduxtestapp.data.repository.TodoRepository
+import com.example.reduxtestapp.data.repository.TodoRepositoryImplementation
 import com.example.reduxtestapp.redux.middleware.AsyncMiddleware
 import com.example.reduxtestapp.redux.todosReducer
 import org.koin.dsl.module
